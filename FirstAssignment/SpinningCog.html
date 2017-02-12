@@ -4,26 +4,39 @@
         <center><h1>Learning Canvas</h1></center>
         <meta charset="utf-8"/>
     </head>
-    <body>
+    <body onload="onLoad();">
+
         <center><canvas id="canvas" width="300" height="300" style="border:3px solid black;"></canvas></center>
 
         <script>
 
             var ctx, canvas;
             var edgeLength = 300;
+            var numberOfTeeth, cogRadiusInput, spikeLengthInput;
+            var teeth = 16;
+            var cogRadius = 65;
+            var teethCircleRadius = 85;
 
             function init() {
                 canvas = document.getElementById("canvas");
                 ctx = canvas.getContext("2d");
                 return setInterval(drawCog, 25);
-                return drawCog();
+            }
+
+            function onLoad() {
+                numberOfTeeth = document.getElementById('numberOfTeeth');
+                cogRadiusInput = document.getElementById('cogRadiusInput');
+                spikeLengthInput = document.getElementById('spikeLengthInput');
+            }
+
+            function changeTeeth() {
+                teeth = numberOfTeeth.value;
+                cogRadius = cogRadiusInput.value;
+                teethCircleRadius = teethLengthInput.value;
             }
 
             function drawCog() {
 
-                var teeth = 16;
-                var cogRadius = 65;
-                var spikeCircleRadius = 85;
                 var x, y, rSmall, rBig;
                 var incSmall = 360/teeth; // dantu inkrementai
                 var incBig = 360/teeth/2;
@@ -58,8 +71,8 @@
                     y = 150 + cogRadius*Math.sin(Math.PI*rSmall/180);
 
                     // Randamos trikampiu virsunes koordinates
-                    spikeX = 150 + spikeCircleRadius*Math.cos(Math.PI*(rSmall+incBig)/180);
-                    spikeY = 150 + spikeCircleRadius*Math.sin(Math.PI*(rSmall+incBig)/180);
+                    spikeX = 150 + teethCircleRadius*Math.cos(Math.PI*(rSmall+incBig)/180);
+                    spikeY = 150 + teethCircleRadius*Math.sin(Math.PI*(rSmall+incBig)/180);
 
                     ctx.beginPath();
                     ctx.moveTo(x, y);
@@ -70,10 +83,17 @@
 
                     rSmall += incSmall;
                 }
+
             }
             init();
 
         </script>
-
+        <center>
+            <br>
+            <b>Number of Teeth</b> <input id="numberOfTeeth" type="text" value="16" size="1"><br>
+            <b>Cog Radius</b> <input id="cogRadiusInput" type="text" value="65" size="1"><br>
+            <b>Teeth Length</b> <input id="teethLengthInput" type="text" value="85" size="1"><br>
+            <input type="button" value="change" onclick="changeTeeth();"/>
+        </center>
     </body>
 </html>
