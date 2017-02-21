@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <center><h1>Canvas</h1></center>
+        <meta charset="utf-8"/>
+    </head>
+
+
+    <body>
+
+        <center><canvas id="canvas" width="500" height="500" style="border:3px solid black;"></canvas></center>
+
+        <script>
+
+            var canvas, ctx;
+            function init() {
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            }
+
+            function Gear(xPos, yPos, radius, teethNumber, teethRadius, color) {
+
+                this.xPos = xPos;
+                this.yPos = yPos;
+                this.radius = radius;
+                this.teethNumber = teethNumber;
+                this.teethRadius = teethRadius;
+                this.color = color;
+
+
+
+                this.drawGear = function drawGear() {
+
+                    var rSmall, rBig; // Skritulio ir dantens spinduliai
+                    var x, y, spikeX, spikeY;
+                    var incSmall = 360/this.teethNumber; // dantu inkrementai
+                    var incBig = 360/this.teethNumber/2;
+
+
+
+                    // Dantiracio skritulys
+                    ctx.beginPath();
+                    ctx.fillStyle = this.color;
+                    ctx.arc(this.xPos, this.yPos, this.radius, 0, Math.PI*2, true);
+                    ctx.fill();
+
+                    // Dantiracio vidurys
+                    ctx.beginPath();
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.arc(this.xPos, this.yPos, 10, 0, Math.PI * 2, true);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = this.color;
+                    rSmall = rBig = 0;
+
+                    // Dantu generavimas
+                    for (i = 0; i < this.teethNumber; i++, rSmall+=incSmall) {
+
+                        // Randamos trikampio kampo koordinates
+                        x = this.xPos + this.radius*Math.cos(Math.PI*rSmall/180);
+                        y = this.yPos + this.radius*Math.sin(Math.PI*rSmall/180);
+
+                        // Randamos trikampio virsunes korrdinates
+                        spikeX = this.xPos + this.teethRadius*Math.cos(Math.PI*(rSmall+incBig)/180);
+                        spikeY = this.yPos + this.teethRadius*Math.sin(Math.PI*(rSmall+incBig)/180);
+
+                        // Piesiamas trikampis
+                        ctx.beginPath();
+                        ctx.moveTo(x, y);
+                        ctx.lineTo(spikeX, spikeY);
+                        ctx.lineTo(this.xPos + this.radius*Math.cos(Math.PI*(rSmall+incSmall)/180), this.yPos + this.radius*Math.sin(Math.PI*(rSmall+incSmall)/180));
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+
+                }
+
+           
+            }
+            init();
+            bigGear = new Gear(150, 150, 80, 16, 100, 'blue', 'true');
+            bigGear.drawGear();
+
+
+            init();
+        </script>
+
+    </body>
+</html>
