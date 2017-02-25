@@ -13,9 +13,9 @@
             var dragEnabled = false;
             var rotate = 0;
                                     //  x    y  rad  srad  tn   col
-            var bigGear = new Gear    (150, 180, 130, 145, 50, 'green');
+            var bigGear = new Gear    (150, 180, 130, 145, 50, 'orange');
             var smallGear = new Gear  (327.6, 280, 55, 70, 18, 'blue');
-            var triggerGear = new Gear(250, 400, 20, 35, 7, 'red');
+            var triggerGear = new Gear(250, 400, 23, 35.5, 7, 'red');
 
             function init() {
 
@@ -102,12 +102,16 @@
                 this.enableRotation = function enableRotation(direction, angleIncrement) {
 
                     rotationAngle += angleIncrement;
+
+                    // Direction 0 - stovi vietoje, 1 - sukasi pagal laikrodzio rodykle, -1 - sukasi pries laikrodzio rodykle
                     if (direction == 0) {
                         ctx.save();
                         ctx.translate(this.xPos, this.yPos);
                         this.drawGear();
                         ctx.restore();
+                        rotationAngle = 0;
                     }
+
                     if (direction == 1) {
                         ctx.save();
                         ctx.translate(this.xPos, this.yPos);
@@ -115,6 +119,7 @@
                         this.drawGear();
                         ctx.restore();
                     }
+
                     if (direction == -1) {
                         ctx.save();
                         ctx.translate(this.xPos, this.yPos);
@@ -122,12 +127,13 @@
                         this.drawGear();
                         ctx.restore();
                     }
+
                     if( rotationAngle >= (Math.PI*2))
                         rotationAngle = 0;
                 }
             }
 
-            function myMove(e) {
+            function mouseDrag(e) {
 
                 if (dragEnabled) {
                     triggerGear.xPos = e.pageX - canvas.offsetLeft;
@@ -135,7 +141,7 @@
                 }
             }
 
-            function myDown(e) {
+            function mouseDown(e) {
 
                     x = triggerGear.xPos;
                     y = triggerGear.yPos;
@@ -145,19 +151,19 @@
                         triggerGear.xPos = e.pageX - canvas.offsetLeft;
                         triggerGear.yPos = e.pageY - canvas.offsetTop;
                         dragEnabled = true;
-                        canvas.onmousemove = myMove;
+                        canvas.onmousemove = mouseDrag;
                     }
             }
 
-            function myUp() {
+            function mouseUp() {
 
                 dragEnabled = false;
                 canvas.onmousemove = null;
             }
 
             init();
-            canvas.onmousedown = myDown;
-            canvas.onmouseup = myUp;
+            canvas.onmousedown = mouseDown;
+            canvas.onmouseup = mouseUp;
 
         </script>
     </body>
