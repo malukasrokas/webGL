@@ -10,38 +10,46 @@
 
             var ctx, canvas;
             var edgeLength = 500;
-            var rotationAngle = 0;
-                                  //  x    y  rad  srad  tn   col
-            var bigGear = new Gear  (150, 150, 130, 145, 50, 'green');
-            var smallGear = new Gear(330, 270, 60, 75, 18, 'blue');
+            var dragEnabled = false;
+            var rotate = 0;
+                                    //  x    y  rad  srad  tn   col
+            var bigGear = new Gear    (150, 180, 130, 145, 50, 'green');
+            var smallGear = new Gear  (327.6, 280, 55, 70, 18, 'blue');
+            var triggerGear = new Gear(250, 400, 20, 35, 7, 'red');
 
             function init() {
+
                 canvas = document.getElementById("canvas");
                 ctx = canvas.getContext("2d");
                 return setInterval(drawGears, 25);
             }
 
+
             function drawGears(){
 
+                rotAngle = Math.PI/180;
                 ctx.clearRect(0, 0, edgeLength, edgeLength);
-                ctx.save();
-                ctx.save();
-                ctx.translate(bigGear.xPos, bigGear.yPos);
-                rotationAngle = rotationAngle + (Math.PI)/180;
-                ctx.rotate(rotationAngle);
-                bigGear.drawGear();
+                smallGear.enableRotation(rotate, rotAngle*(bigGear.teethNumber/smallGear.teethNumber)/4);
+                bigGear.enableRotation(rotate*(-1), rotAngle/4);
+                triggerGear.enableRotation(1, rotAngle*(bigGear.teethNumber/smallGear.teethNumber)/1.555);
 
-                ctx.restore();
-                ctx.translate(smallGear.xPos, smallGear.yPos);
-                ctx.rotate(-rotationAngle);
-                smallGear.drawGear();
-                ctx.restore();
+                if (Math.sqrt(Math.pow(bigGear.xPos - triggerGear.xPos, 2) + Math.pow(bigGear.yPos - triggerGear.yPos, 2)) <= triggerGear.teethRadius+5+bigGear.radius) {
+                    rotate = 1;
+                    dragEnabled = false;
+                }
 
-                if(rotationAngle >= (Math.PI*2))
-                    rotationAngle = 0;
+                else if (Math.sqrt(Math.pow(smallGear.xPos - triggerGear.xPos, 2) + Math.pow(smallGear.yPos - triggerGear.yPos, 2)) <= triggerGear.teethRadius+3+smallGear.radius) {
+                    rotate = -1;
+                    dragEnabled = false;
+                }
+
+                else
+                    rotate = 0;
             }
 
             function Gear(xPos, yPos, radius, teethRadius, teethNumber, color) {
+
+                var rotationAngle = 0;
 
                 this.xPos = xPos;
                 this.yPos = yPos;
@@ -50,6 +58,7 @@
                 this.teethRadius = teethRadius;
                 this.color = color;
                 this.drawGear = function drawGear() {
+
                     var rSmall, rBig; // Skritulio ir dantens spinduliai
                     var x, y, spikeX, spikeY;
                     var incSmall = 360/this.teethNumber; // dantu inkrementai
@@ -67,7 +76,6 @@
                     ctx.arc(0, 0, 10, 0, Math.PI * 2, true);
                     ctx.fill();
                     ctx.stroke();
-
                     ctx.fillStyle = this.color;
                     rSmall = rBig = 0;
 
@@ -91,9 +99,66 @@
                         ctx.stroke();
                     }
                 }
+                this.enableRotation = function enableRotation(direction, angleIncrement) {
+
+                    rotationAngle += angleIncrement;
+                    if (direction == 0) {
+                        ctx.save();
+                        ctx.translate(this.xPos, this.yPos);
+                        this.drawGear();
+                        ctx.restore();
+                    }
+                    if (direction == 1) {
+                        ctx.save();
+                        ctx.translate(this.xPos, this.yPos);
+                        ctx.rotate(rotationAngle);
+                        this.drawGear();
+                        ctx.restore();
+                    }
+                    if (direction == -1) {
+                        ctx.save();
+                        ctx.translate(this.xPos, this.yPos);
+                        ctx.rotate(-rotationAngle);
+                        this.drawGear();
+                        ctx.restore();
+                    }
+                    if( rotationAngle >= (Math.PI*2))
+                        rotationAngle = 0;
+                }
             }
-            
+
+            function myMove(e) {
+
+                if (dragEnabled) {
+                    triggerGear.xPos = e.pageX - canvas.offsetLeft;
+                    triggerGear.yPos = e.pageY - canvas.offsetTop;
+                }
+            }
+
+            function myDown(e) {
+
+                    x = triggerGear.xPos;
+                    y = triggerGear.yPos;
+                    if (e.pageX < x + 20 + canvas.offsetLeft  && e.pageX > x -20 + canvas.offsetLeft   &&
+                        e.pageY < y + 20 + canvas.offsetTop && e.pageY > y - 20 + canvas.offsetTop )
+                    {
+                        triggerGear.xPos = e.pageX - canvas.offsetLeft;
+                        triggerGear.yPos = e.pageY - canvas.offsetTop;
+                        dragEnabled = true;
+                        canvas.onmousemove = myMove;
+                    }
+            }
+
+            function myUp() {
+
+                dragEnabled = false;
+                canvas.onmousemove = null;
+            }
+
             init();
+            canvas.onmousedown = myDown;
+            canvas.onmouseup = myUp;
+
         </script>
     </body>
 </html>
