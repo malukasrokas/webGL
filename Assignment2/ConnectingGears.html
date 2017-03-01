@@ -15,7 +15,7 @@
                                     //  x    y  rad  srad  tn   col
             var bigGear = new Gear    (150, 180, 130, 145, 50, 'orange');
             var smallGear = new Gear  (327.6, 280, 55, 70, 18, 'blue');
-            var triggerGear = new Gear(250, 400, 23, 35.5, 7, 'red');
+            var triggerGear = new Gear(250, 400, 23, 36, 7, 'red');
 
             function init() {
 
@@ -27,18 +27,18 @@
 
             function drawGears(){
 
-                rotAngle = Math.PI/180;
+                rotAngle = Math.PI/180/4;
                 ctx.clearRect(0, 0, edgeLength, edgeLength);
-                smallGear.enableRotation(rotate, rotAngle*(bigGear.teethNumber/smallGear.teethNumber)/4);
-                bigGear.enableRotation(rotate*(-1), rotAngle/4);
-                triggerGear.enableRotation(1, rotAngle*(bigGear.teethNumber/smallGear.teethNumber)/1.555);
+                smallGear.enableRotation(rotate, rotAngle*(bigGear.teethNumber/smallGear.teethNumber));
+                bigGear.enableRotation(rotate*(-1), rotAngle);
+                triggerGear.enableRotation(1, rotAngle*(bigGear.teethNumber/smallGear.teethNumber)/0.38875);
 
-                if (Math.sqrt(Math.pow(bigGear.xPos - triggerGear.xPos, 2) + Math.pow(bigGear.yPos - triggerGear.yPos, 2)) <= triggerGear.teethRadius+5+bigGear.radius) {
+                if (Math.sqrt(Math.pow(bigGear.xPos - triggerGear.xPos, 2) + Math.pow(bigGear.yPos - triggerGear.yPos, 2)) <= triggerGear.teethRadius+7.2+bigGear.radius) {
                     rotate = 1;
                     dragEnabled = false;
                 }
 
-                else if (Math.sqrt(Math.pow(smallGear.xPos - triggerGear.xPos, 2) + Math.pow(smallGear.yPos - triggerGear.yPos, 2)) <= triggerGear.teethRadius+3+smallGear.radius) {
+                else if (Math.sqrt(Math.pow(smallGear.xPos - triggerGear.xPos, 2) + Math.pow(smallGear.yPos - triggerGear.yPos, 2)) <= triggerGear.teethRadius+4+smallGear.radius) {
                     rotate = -1;
                     dragEnabled = false;
                 }
@@ -59,7 +59,7 @@
                 this.color = color;
                 this.drawGear = function drawGear() {
 
-                    var rSmall, rBig; // Skritulio ir dantens spinduliai
+                    var rSmall, rBig; // Skritulio ir dantens ka
                     var x, y, spikeX, spikeY;
                     var incSmall = 360/this.teethNumber; // dantu inkrementai
                     var incBig = 360/this.teethNumber/2;
@@ -72,7 +72,7 @@
 
                     // Dantiracio vidurys
                     ctx.beginPath();
-                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillStyle = 'white';
                     ctx.arc(0, 0, 10, 0, Math.PI * 2, true);
                     ctx.fill();
                     ctx.stroke();
@@ -145,8 +145,8 @@
 
                     x = triggerGear.xPos;
                     y = triggerGear.yPos;
-                    if (e.pageX < x + 20 + canvas.offsetLeft  && e.pageX > x -20 + canvas.offsetLeft   &&
-                        e.pageY < y + 20 + canvas.offsetTop && e.pageY > y - 20 + canvas.offsetTop )
+                    if (e.pageX < x + 20 + canvas.offsetLeft  && e.pageX > x -20 + canvas.offsetLeft &&
+                        e.pageY < y + 20 + canvas.offsetTop   && e.pageY > y -20 + canvas.offsetTop )
                     {
                         triggerGear.xPos = e.pageX - canvas.offsetLeft;
                         triggerGear.yPos = e.pageY - canvas.offsetTop;
