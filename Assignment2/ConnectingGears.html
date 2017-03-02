@@ -13,9 +13,9 @@
             var dragEnabled = false;
             var rotate = 0;
                                     //  x    y  rad  srad  tn   col
-            var bigGear = new Gear    (150, 180, 130, 145, 50, 'orange');
-            var smallGear = new Gear  (327.6, 280, 55, 70, 18, 'blue');
-            var triggerGear = new Gear(250, 400, 23, 36, 7, 'red');
+            var BigGear = new Gear    (150, 180, 130, 145, 50, 'orange');
+            var SmallGear = new Gear  (327.6, 280, 55, 70, 18, 'blue');
+            var TriggerGear = new Gear(250, 400, 23, 36, 7, 'red');
 
             function init() {
 
@@ -23,22 +23,36 @@
                 ctx = canvas.getContext("2d");
                 return setInterval(drawGears, 25);
             }
+            // Pitagoro teorema randama ar dantiraciu atstumai yra mazesni uz ju spinduliu suma
+            function distanceBetweenLessThanRadiusSum(TriggerGearObj, TouchingGearObj) {
 
+                // Tikslesnei kolizijai pridedamas papildomas atstumas tarp spinduliu
+                additionalDistance = 0;
+
+                if (TouchingGearObj == BigGear)
+                    additionalDistance = 7.4;
+
+                else if (TouchingGearObj == SmallGear)
+                    additionalDistance = 4;
+
+                return (Math.sqrt(Math.pow(TouchingGearObj.xPos - TriggerGearObj.xPos, 2) + Math.pow(TouchingGearObj.yPos - TriggerGearObj.yPos, 2)) <= TriggerGearObj.teethRadius+additionalDistance+TouchingGearObj.radius);
+            }
 
             function drawGears(){
 
                 rotAngle = Math.PI/180/4;
                 ctx.clearRect(0, 0, edgeLength, edgeLength);
-                smallGear.enableRotation(rotate, rotAngle*(bigGear.teethNumber/smallGear.teethNumber));
-                bigGear.enableRotation(rotate*(-1), rotAngle);
-                triggerGear.enableRotation(1, rotAngle*(bigGear.teethNumber/smallGear.teethNumber)/0.38875);
 
-                if (Math.sqrt(Math.pow(bigGear.xPos - triggerGear.xPos, 2) + Math.pow(bigGear.yPos - triggerGear.yPos, 2)) <= triggerGear.teethRadius+7.2+bigGear.radius) {
+                SmallGear.enableRotation(rotate, rotAngle*(BigGear.teethNumber/SmallGear.teethNumber));
+                BigGear.enableRotation(rotate*(-1), rotAngle);
+                TriggerGear.enableRotation(1, rotAngle*(BigGear.teethNumber/SmallGear.teethNumber)/0.38875);
+
+                if (distanceBetweenLessThanRadiusSum(TriggerGear, BigGear)) {
                     rotate = 1;
                     dragEnabled = false;
                 }
 
-                else if (Math.sqrt(Math.pow(smallGear.xPos - triggerGear.xPos, 2) + Math.pow(smallGear.yPos - triggerGear.yPos, 2)) <= triggerGear.teethRadius+4+smallGear.radius) {
+                else if (distanceBetweenLessThanRadiusSum(TriggerGear, SmallGear)) {
                     rotate = -1;
                     dragEnabled = false;
                 }
@@ -55,13 +69,15 @@
                 this.yPos = yPos;
                 this.radius = radius;
                 this.teethNumber = teethNumber;
-                this.teethRadius = teethRadius;
+                this.teethRadius = teethRadius; // Atstumas nuo dantiracio centro iki danties virsunes
                 this.color = color;
                 this.drawGear = function drawGear() {
 
-                    var rSmall, rBig; // Skritulio ir dantens ka
+                    // rSmall ir rBig yra kampu laipsniai, kuriuose bus piesiami dantys
+                    var rSmall, rBig;
                     var x, y, spikeX, spikeY;
-                    var incSmall = 360/this.teethNumber; // dantu inkrementai
+                    // Inkrementai, po kuriu bus piesiami dantys
+                    var incSmall = 360/this.teethNumber;
                     var incBig = 360/this.teethNumber/2;
 
                     // Dantiracio skritulys
@@ -86,7 +102,7 @@
                         x = this.radius*Math.cos(Math.PI*rSmall/180);
                         y = this.radius*Math.sin(Math.PI*rSmall/180);
 
-                        // Randamos trikampio virsunes korrdinates
+                        // Randamos dantens virsunes koordinates
                         spikeX = this.teethRadius*Math.cos(Math.PI*(rSmall+incBig)/180);
                         spikeY = this.teethRadius*Math.sin(Math.PI*(rSmall+incBig)/180);
 
@@ -102,31 +118,23 @@
                 this.enableRotation = function enableRotation(direction, angleIncrement) {
 
                     rotationAngle += angleIncrement;
+                    ctx.save();
+                    ctx.translate(this.xPos, this.yPos);
 
-                    // Direction 0 - stovi vietoje, 1 - sukasi pagal laikrodzio rodykle, -1 - sukasi pries laikrodzio rodykle
-                    if (direction == 0) {
-                        ctx.save();
-                        ctx.translate(this.xPos, this.yPos);
-                        this.drawGear();
-                        ctx.restore();
-                        rotationAngle = 0;
+                    switch(direction) {
+                        case 0: // Stovi vietoje
+                            rotationAngle = 0;
+                            break;
+                        case -1: // Sukasi pries laikrodzio rodykle
+                            ctx.rotate(-rotationAngle);
+                            break;
+                        case 1: // Sukasi pagal laikrodzio rodykle
+                            ctx.rotate(rotationAngle);
+                            break;
                     }
 
-                    if (direction == 1) {
-                        ctx.save();
-                        ctx.translate(this.xPos, this.yPos);
-                        ctx.rotate(rotationAngle);
-                        this.drawGear();
-                        ctx.restore();
-                    }
-
-                    if (direction == -1) {
-                        ctx.save();
-                        ctx.translate(this.xPos, this.yPos);
-                        ctx.rotate(-rotationAngle);
-                        this.drawGear();
-                        ctx.restore();
-                    }
+                    this.drawGear();
+                    ctx.restore();
 
                     if( rotationAngle >= (Math.PI*2))
                         rotationAngle = 0;
@@ -136,20 +144,20 @@
             function mouseDrag(e) {
 
                 if (dragEnabled) {
-                    triggerGear.xPos = e.pageX - canvas.offsetLeft;
-                    triggerGear.yPos = e.pageY - canvas.offsetTop;
+                    TriggerGear.xPos = e.pageX - canvas.offsetLeft;
+                    TriggerGear.yPos = e.pageY - canvas.offsetTop;
                 }
             }
 
             function mouseDown(e) {
 
-                    x = triggerGear.xPos;
-                    y = triggerGear.yPos;
+                    x = TriggerGear.xPos;
+                    y = TriggerGear.yPos;
                     if (e.pageX < x + 20 + canvas.offsetLeft  && e.pageX > x -20 + canvas.offsetLeft &&
                         e.pageY < y + 20 + canvas.offsetTop   && e.pageY > y -20 + canvas.offsetTop )
                     {
-                        triggerGear.xPos = e.pageX - canvas.offsetLeft;
-                        triggerGear.yPos = e.pageY - canvas.offsetTop;
+                        TriggerGear.xPos = e.pageX - canvas.offsetLeft;
+                        TriggerGear.yPos = e.pageY - canvas.offsetTop;
                         dragEnabled = true;
                         canvas.onmousemove = mouseDrag;
                     }
