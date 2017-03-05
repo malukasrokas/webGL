@@ -21,7 +21,7 @@
 
                 canvas = document.getElementById("canvas");
                 ctx = canvas.getContext("2d");
-                return setInterval(drawGears, 25);
+                return setInterval(drawGears, 1);
             }
             // Pitagoro teorema randama ar dantiraciu atstumai yra mazesni uz ju spinduliu suma
             function distanceBetweenLessThanRadiusSum(TriggerGearObj, TouchingGearObj) {
@@ -40,7 +40,7 @@
 
             function drawGears(){
 
-                rotAngle = Math.PI/180/4;
+                rotAngle = Math.PI/180/25;
                 ctx.clearRect(0, 0, edgeLength, edgeLength);
 
                 SmallGear.enableRotation(rotate, rotAngle*(BigGear.teethNumber/SmallGear.teethNumber));
