@@ -1,108 +1,230 @@
 <html>
-    <title>
-        Computer Graphics curriculum
-    </title>
-    <body>
+    <head>
+        <style>
+            div.container {
+                width: 100%;
+                border: 1px solid gray;
+            }
 
-            <div>
-                <h3>Homework</h3>
-                <h2>Goal</h2>
-                <p>Create one spinning gearssss</p>
-                <h2>Execution</h2>
-                <li> Around the gear circle triangles were drawn</li>
-                
-            </div>
+            header, footer {
+                padding: 1em;
+                color: white;
+                background-color: navy;
+                clear: left;
+                text-align: center;
+            }
 
+            nav {
+                float: left;
+                max-width: 900px;
+                margin: 0;
+                padding: 1em;
+            }
 
-            <b>Number of Teeth</b> <input id="numberOfTeeth" type="text" value="16" size="1"><br>
-            <b>Cog Radius</b> <input id="cogRadiusInput" type="text" value="65" size="1"><br>
-            <b>Teeth Length</b> <input id="teethLengthInput" type="text" value="85" size="1"><br>
-            <input type="button" value="change" onclick="changeTeeth();"/>
-            <br><br>
-            <div class="column style="margin=left:auto; margin-right:0"">
-                <canvas id="canvas" width="300" height="300" style="border:3px solid black;"></canvas>
+            nav ul {
+                list-style-type: none;
+                padding: 0;
+            }
 
+            nav ul a {
+                text-decoration: none;
+            }
+
+            article {
+                margin-left: 250px;
+                border-left: 1px solid gray;
+                padding: 1em;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body onload="onLoad();">
+
+        <div class="container">
+
+        <header>
+           <h1>Kompiuterinė Grafika</h1>
+        </header>
+
+        </div>
+
+        <div class="container">
+            <nav>
+              <p><b>1 atsiskaitymas</b></p>
+                  <p>Užduotis:</p>
+                <li>Naudojant HTML5 “canvas” pavaizduoti tris besisukančius dantiračius</a></li>
+                <li>Du didesni dantiračiai sukibę ir pradžioje nesisuka, o mažesnis “varomasis” dantiratis<br> pastoviai sukasi ir yra valdomas: kai tik prisiliečia prie kito dantiračio – pradeda jį sukti </li>
+                <li>Varomojo dantiračio padėtį galima keisti naudojant pelę</li>
+                <p><b>Įgyvendinimas</b></p>
+                <li>Dantiračiam piešti pasitelkta objektiniu programavimu</li>
+                <li>Minimaliem galimiem atstumam tarp dantiračių rasti pasitelkta pitagoro teorema</li>
+                <a href="https://github.com/malukasrokas/webGL-HTML5/blob/master/Assignment2/ConnectingGears.html">Kodas</a>
+
+            </nav>
+            <article>
+                <canvas id="canvas" width="500" height="500" style="border:3px solid black;"></canvas>
                 <script>
+                var ctx, canvas;
+                var edgeLength = 500;
+                var dragEnabled = false;
+                var rotate = 0;
+                                        //  x    y  rad  srad  tn   col
+                var BigGear = new Gear    (150, 180, 130, 145, 50, 'orange');
+                var SmallGear = new Gear  (327.6, 280, 55, 70, 18, 'blue');
+                var TriggerGear = new Gear(250, 400, 23, 36, 7, 'red');
 
-                    var ctx, canvas;
-                    var edgeLength = 300;
-                    var numberOfTeeth, cogRadiusInput, spikeLengthInput;
-                    var teeth = 16;
-                    var cogRadius = 65;
-                    var teethCircleRadius = 85;
+                function init() {
 
-                    function init() {
-                        canvas = document.getElementById("canvas");
-                        ctx = canvas.getContext("2d");
-                        return setInterval(drawCog, 25);
+                    canvas = document.getElementById("canvas");
+                    ctx = canvas.getContext("2d");
+                    return setInterval(drawGears, 1);
+                }
+
+                function distanceBetweenLessThanRadiusSum(TriggerGearObj, TouchingGearObj) {
+
+
+
+                    if (TouchingGearObj == BigGear)
+                        additionalDistance = 7.4;
+
+                    else if (TouchingGearObj == SmallGear)
+                        additionalDistance = 4;
+
+                    return (Math.sqrt(Math.pow(TouchingGearObj.xPos - TriggerGearObj.xPos, 2) + Math.pow(TouchingGearObj.yPos - TriggerGearObj.yPos, 2)) <= TriggerGearObj.teethRadius+additionalDistance+TouchingGearObj.radius);
+                }
+
+                function drawGears(){
+
+
+                    rotAngle = Math.PI/180/25;
+                    ctx.clearRect(0, 0, edgeLength, edgeLength);
+
+                    SmallGear.enableRotation(rotate, rotAngle*(BigGear.teethNumber/SmallGear.teethNumber));
+                    BigGear.enableRotation(rotate*(-1), rotAngle);
+                    TriggerGear.enableRotation(1, rotAngle*(BigGear.teethNumber/SmallGear.teethNumber)/0.38875);
+
+                    if (distanceBetweenLessThanRadiusSum(TriggerGear, BigGear)) {
+                        rotate = 1;
+                        dragEnabled = false;
                     }
 
-                    function onLoad() {
-                        numberOfTeeth = document.getElementById('numberOfTeeth');
-                        cogRadiusInput = document.getElementById('cogRadiusInput');
-                        spikeLengthInput = document.getElementById('spikeLengthInput');
+                    else if (distanceBetweenLessThanRadiusSum(TriggerGear, SmallGear)) {
+                        rotate = -1;
+                        dragEnabled = false;
                     }
 
-                    function changeTeeth() {
-                        teeth = numberOfTeeth.value;
-                        cogRadius = cogRadiusInput.value;
-                        teethCircleRadius = teethLengthInput.value;
-                    }
+                    else
+                        rotate = 0;
+                }
 
-                    function drawCog() {
+                function Gear(xPos, yPos, radius, teethRadius, teethNumber, color) {
 
-                        var x, y, rSmall, rBig;
-                        var incSmall = 360/teeth; // dantu inkrementai
-                        var incBig = 360/teeth/2;
+                    var rotationAngle = 0;
 
-                        // Sukimasis aplink savo asi
-                        ctx.clearRect(0, 0, edgeLength, edgeLength);
-                        ctx.translate(edgeLength/2, edgeLength/2);
-                        ctx.rotate(Math.PI / 180);
-                        ctx.translate(-edgeLength/2, -edgeLength/2);
+                    this.xPos = xPos;
+                    this.yPos = yPos;
+                    this.radius = radius;
+                    this.teethNumber = teethNumber;
+                    this.teethRadius = teethRadius;
+                    this.color = color;
+                    this.drawGear = function drawGear() {
 
-                        // Dantiracio apskritimas
+                        var rSmall, rBig;
+                        var x, y, spikeX, spikeY;
+                        var incSmall = 360/this.teethNumber;
+                        var incBig = 360/this.teethNumber/2;
+
                         ctx.beginPath();
-                        ctx.fillStyle = '#375392';
-                        ctx.arc(150, 150, cogRadius, 0, Math.PI*2, true);
+                        ctx.fillStyle = this.color;
+                        ctx.arc(0, 0, this.radius, 0, Math.PI*2, true);
                         ctx.fill();
 
-                        // Dantiracio vidurys
                         ctx.beginPath();
-                        ctx.fillStyle = '#FFFFFF';
-                        ctx.arc(150, 150, 10, 0, Math.PI * 2, true);
+                        ctx.fillStyle = 'white';
+                        ctx.arc(0, 0, 10, 0, Math.PI * 2, true);
                         ctx.fill();
                         ctx.stroke();
-
-                        ctx.fillStyle = '#375392';
+                        ctx.fillStyle = this.color;
                         rSmall = rBig = 0;
 
-                        // Dantu generavimas
-                        for (i = 0; i < teeth; i++) {
+                        for (i = 0; i < this.teethNumber; i++, rSmall+=incSmall) {
 
-                            // Randamos trikampiu krastines koordinates
-                            x = 150 + cogRadius*Math.cos(Math.PI*rSmall/180);
-                            y = 150 + cogRadius*Math.sin(Math.PI*rSmall/180);
+                            x = this.radius*Math.cos(Math.PI*rSmall/180);
+                            y = this.radius*Math.sin(Math.PI*rSmall/180);
 
-                            // Randamos trikampiu virsunes koordinates
-                            spikeX = 150 + teethCircleRadius*Math.cos(Math.PI*(rSmall+incBig)/180);
-                            spikeY = 150 + teethCircleRadius*Math.sin(Math.PI*(rSmall+incBig)/180);
+                            spikeX = this.teethRadius*Math.cos(Math.PI*(rSmall+incBig)/180);
+                            spikeY = this.teethRadius*Math.sin(Math.PI*(rSmall+incBig)/180);
 
                             ctx.beginPath();
                             ctx.moveTo(x, y);
                             ctx.lineTo(spikeX, spikeY);
-                            ctx.lineTo(150 + cogRadius*Math.cos(Math.PI*(rSmall+incSmall)/180), 150 + cogRadius*Math.sin(Math.PI*(rSmall+incSmall)/180));
+                            ctx.lineTo(this.radius*Math.cos(Math.PI*(rSmall+incSmall)/180), this.radius*Math.sin(Math.PI*(rSmall+incSmall)/180));
                             ctx.fill();
                             ctx.stroke();
+                        }
+                    }
+                    this.enableRotation = function enableRotation(direction, angleIncrement) {
 
-                            rSmall += incSmall;
+                        rotationAngle += angleIncrement;
+                        ctx.save();
+                        ctx.translate(this.xPos, this.yPos);
+
+                        switch(direction) {
+                            case 0:
+                                rotationAngle = 0;
+                                break;
+                            case -1:
+                                ctx.rotate(-rotationAngle);
+                                break;
+                            case 1:
+                                ctx.rotate(rotationAngle);
+                                break;
                         }
 
-                    }
-                    init();
+                        this.drawGear();
+                        ctx.restore();
 
+
+                    }
+                }
+
+                function mouseDrag(e) {
+
+                    if (dragEnabled) {
+                        TriggerGear.xPos = e.pageX - canvas.offsetLeft;
+                        TriggerGear.yPos = e.pageY - canvas.offsetTop;
+                    }
+                }
+
+                function mouseDown(e) {
+
+                        x = TriggerGear.xPos;
+                        y = TriggerGear.yPos;
+                        if (e.pageX < x + 20 + canvas.offsetLeft  && e.pageX > x -20 + canvas.offsetLeft &&
+                            e.pageY < y + 20 + canvas.offsetTop   && e.pageY > y -20 + canvas.offsetTop )
+                        {
+                            TriggerGear.xPos = e.pageX - canvas.offsetLeft;
+                            TriggerGear.yPos = e.pageY - canvas.offsetTop;
+                            dragEnabled = true;
+                            canvas.onmousemove = mouseDrag;
+                        }
+                }
+
+                function mouseUp() {
+
+                    dragEnabled = false;
+                    canvas.onmousemove = null;
+                }
+
+                init();
+                canvas.onmousedown = mouseDown;
+                canvas.onmouseup = mouseUp;
                 </script>
 
-            </div>
+            </article>
+        </div>
+
     </body>
+
+    <footer>Rokas M.</footer>
 </html>
