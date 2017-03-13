@@ -105,6 +105,7 @@ function Gear(xPos, yPos, radius, teethRadius, teethNumber, color) {
             ctx.stroke();
         }
     }
+
     this.enableRotation = function enableRotation(direction, angleIncrement) {
 
         rotationAngle += angleIncrement;
@@ -125,8 +126,6 @@ function Gear(xPos, yPos, radius, teethRadius, teethNumber, color) {
 
         this.drawGear();
         ctx.restore();
-
-
     }
 }
 
