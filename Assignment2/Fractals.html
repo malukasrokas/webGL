@@ -3,17 +3,20 @@
     <body>
         <center><canvas id="canvas2" width="500px" height="500px" style="border:3px solid black"></canvas></center>
         <div>
-            <center><p style="font-size:20px;">Level</p>
-                    <a onclick="levelDown();" class="bolden" href="javascript:window.location.href=window.location.href"> < </a>
-                    <level id="level" class="bolden" style="font-size:30px; font-weight:bold">5</level>
-                    <a onclick="levelUp();" class="bolden" href="javascript:window.location.href=window.location.href"> > </a>
+
+            <center>
+                <p style="font-size:20px;"><b>Level</b></p>
+                <button class="button" onclick="levelDown()" type="button"> < </button>
+                <level id="level" class="bolden" style="font-size:25px; font-weight:bold">-1</level>
+                <button class="button" onclick="levelUp()" type="button"> > </button>
             </center>
         </div>
         <script>
 
         var canvas, ctx;
         var level = document.getElementById("level").innerHTML;
-
+        //document.getElementById("level").innerHTML = "hey";
+        //levelUp();
         function init() {
             canvas = document.getElementById('canvas2');
             if (canvas.getContext) {
@@ -66,24 +69,42 @@
                 ctx.transform(-0.5, 0, 0, -0.5, canvas.width/2, canvas.width);
                 drawF(step);
 
+
             }
             else
                 drawFigure();
         }
 
         function levelDown() {
-            level = level - 1;
-            document.getElementById('level').innerHTML = level;
+            if (level == -1)
+                return
+            else {
+                ctx.save();
+                level --;
+                ctx.setTransform(1,0,0,1,0,0);
+                ctx.clearRect(0,0,canvas.width, canvas.height);
+                document.getElementById('level').innerHTML = level;
+                ctx.clearRect(0,0,5000,5000);
+                drawF(level);
+                ctx.restore();
+            }
         }
 
         function levelUp() {
-            level = level + 1;
-            document.getElementById('level').innerHTML = level;
+            if (level == 6)
+                return
+            else {
+                ctx.save();
+                level ++;
+                ctx.setTransform(1,0,0,1,0,0);
+                document.getElementById("level").innerHTML = level;
+                ctx.clearRect(0,0,canvas.height, canvas.width);
+                drawF(level);
+                ctx.restore();
+            }
         }
 
         init();
-        drawF(5);
-
         </script>
     </body>
 
@@ -94,5 +115,26 @@
         font-weight:bold;
         font-size: 28;
         text-decoration:none;
+    }
+    .button {
+        display: inline-block;
+        padding: 2px 8px;
+        font-size: 24px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        outline: none;
+        color: #fff;
+        background-color: #4CAF50;
+        border: none;
+        border-radius: 15px;
+
+    }
+
+    .button:hover {background-color: #3e8e41}
+
+    .button:active {
+        box-shadow: 0 1px #666;
+        transform: translateY(4px);
     }
 </style>
