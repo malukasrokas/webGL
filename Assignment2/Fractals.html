@@ -46,7 +46,7 @@
                 ctx.save();
                 ctx.save();
 
-                ctx.transform(-0.25, 0, 0, 0.25, canvas.width/4, canvas.width/4);
+                ctx.transform(-0.25, 0, 0, 0.25, canvas.width/4, canvas.height/4);
                 ctx.rotate(Math.PI/2);
                 fractalize(level);
                 ctx.restore();
@@ -67,6 +67,70 @@
                 drawShape();
         }
 
+        function animate(quarter) {
+            var a, d, e, f;
+            var currentTransform = {
+                a : 1,
+                d : 1,
+                e : 0,
+                f : 0,
+            };
+            switch (quarter) {
+                case 1:
+                    a = -0.25;
+                    d = 0.25;
+                    e = canvas.width/4;
+                    f = canvas.height/4
+                    break;
+                case 2:
+                    a = d = 0.5;
+                    e = 250; // 250px
+                    break;
+                case 3:
+                    a = -0.5;
+                    d = 0.5;
+                    e = canvas.width;
+                    f = canvas.height/2;
+                    break;
+                case 4:
+                    a = c = -0.5
+                    e = canvas.width/2;
+                    f = canvas.width;
+                    break;
+            }
+            var scaleInt = 0.1
+            var MoveInt = 50;
+            var moveNull = 0;
+            var moveMeh = 1;
+            var fps = 15;
+            var frame;
+
+            function draw() {
+                setTimeout(function() {
+                    frame = requestAnimationFrame(draw);
+                    currentTransform.a -= 0.1;
+                    currentTransform.d -= 0.1;
+                    currentTransform.e += 50;
+                    a = currentTransform.a;
+                    d = currentTransform.d;
+                    e = currentTransform.e;
+                       if (a <= 0.55)
+                            cancelAnimationFrame(frame);
+                       if (a => 0.5) {
+                           ctx.clearRect(0,0,500,500);
+                           ctx.save();
+                           ctx.transform(a, 0, 0, d, e, 0);
+                           drawShape();
+                           ctx.restore();
+                        }
+
+                }, 1000/fps);
+
+            }
+            draw();
+
+        }
+
         function levelDown() {
             if (level == 0)
                 return
@@ -76,7 +140,7 @@
                 ctx.setTransform(1,0,0,1,0,0);
                 ctx.clearRect(0,0,canvas.width, canvas.height);
                 document.getElementById('level').innerHTML = level;
-                ctx.clearRect(0,0,5000,5000);
+                ctx.clearRect(0,0,500,500);
                 fractalize(level);
                 ctx.restore();
             }
@@ -97,7 +161,8 @@
         }
 
         init();
-        fractalize(level);
+        animate(2);
+        //fractalize(level);
 
         </script>
     </body>
