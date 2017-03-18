@@ -20,6 +20,7 @@
 
         var canvas, ctx;
         var level = document.getElementById("level").innerHTML;
+        var previousLevel = level-1;
         var transformID = document.getElementById("transform").innerHTML;
         var frame;
 
@@ -55,21 +56,30 @@
                 ctx.save();
                 ctx.save();
 
+                if (level == previousLevel)
+                    ctx.fillStyle = "#8b0000";
                 ctx.transform(-0.25, 0, 0, 0.25, canvas.width/4, canvas.height/4);
                 ctx.rotate(Math.PI/2);
                 fractalize(level);
                 ctx.restore();
 
+                if (level == previousLevel)
+                    ctx.fillStyle = "#ADC400";
                 ctx.transform(0.5, 0, 0, 0.5, canvas.width/2, 0);
                 fractalize(level);
                 ctx.restore();
 
-                ctx.transform(-0.5, 0, 0, 0.5, canvas.width, canvas.width/2);
+                if (level == previousLevel)
+                ctx.fillStyle = "#A05959";
+                ctx.transform(-0.5, 0, 0, -0.5, canvas.width/2, canvas.width);
                 fractalize(level);
                 ctx.restore();
 
-                ctx.transform(-0.5, 0, 0, -0.5, canvas.width/2, canvas.width);
+                if (level == previousLevel)
+                    ctx.fillStyle = "#064D8D";
+                ctx.transform(-0.5, 0, 0, 0.5, canvas.width, canvas.width/2);
                 fractalize(level);
+
             }
             else
                 drawShape();
@@ -164,6 +174,7 @@
             else {
                 ctx.save();
                 level --;
+                previousLevel = level-1;
                 ctx.setTransform(1,0,0,1,0,0);
                 ctx.clearRect(0,0,canvas.width, canvas.height);
                 document.getElementById('level').innerHTML = level;
@@ -179,6 +190,7 @@
             else {
                 ctx.save();
                 level ++;
+                previousLevel = level-1;
                 ctx.setTransform(1,0,0,1,0,0);
                 document.getElementById("level").innerHTML = level;
                 ctx.clearRect(0,0,canvas.height, canvas.width);
@@ -209,7 +221,7 @@
 
         init();
         fractalize(0);
-        
+
         </script>
     </body>
 </html>
