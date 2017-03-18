@@ -4,16 +4,16 @@
         <center><canvas id="canvas2" width="500px" height="500px" style="border:3px solid black"></canvas></center>
         <div style="width:120px; margin:0 auto;";>
 
-                <p style="font-size:20px; margin-left:13"><b>Level </b></p>
+                <p style="font-size:20px;"><b>Level </b></p>
                 <button class="button" onclick="levelDown()" type="button"> < </button>
                 <level id="level" class="bolden" style="font-size:25px; font-weight:bold">0</level>
                 <button class="button" onclick="levelUp()" type="button"> > </button>
 
-                <p style="font-size:20px; margin-right:20"><b>Transformation </b></p>
+                <p style="font-size:20px;"><b>Transformation </b></p>
                 <button class="button" onclick="transformPrevious()" type="button"> < </button>
                 <transform id="transform" class="bolden" style="font-size:25px; font-weight:bold">0</transform>
                 <button class="button" onclick="transformNext()" type="button"> > </button>
-
+                <button class="button"  onclick="retransform()" type="button" style="margin-top:10px"> Again </button>
         </div>
 
         <script>
@@ -23,7 +23,6 @@
         var previousLevel = level-1;
         var transformID = document.getElementById("transform").innerHTML;
         var frame;
-
 
         function init() {
             canvas = document.getElementById('canvas2');
@@ -104,43 +103,48 @@
                         d : 0.25,
                         e : canvas.width/4,
                         f : canvas.height/4,
-                    }
+                    };
                     break;
+
                 case 2:
                     targetTransform = {
                         a : 0.5,
                         d : 0.5,
                         e : canvas.width/2,
                         f : 0,
-                    }
+                    };
                     break;
+
                 case 3:
-                    targetTransform = {
-                        a : -0.5,
-                        d : 0.5,
-                        e : canvas.width,
-                        f : canvas.height/2,
-                    }
-                    break;
-                case 4:
                     targetTransform = {
                         a : -0.5,
                         d : -0.5,
                         e : canvas.width/2,
                         f : canvas.width,
-                    }
+                    };
+                    break;
+
+                case 4:
+                    targetTransform = {
+                        a : -0.5,
+                        d : 0.5,
+                        e : canvas.width,
+                        f : canvas.height/2,
+                    };
                     break;
             }
 
             var intervals = 100; // Kiek iteraciju bus skirta vienai animacijai
-            // Intervalai, kuriuos pridesim su kiekviena iteracija animacijai
+
+            // Intervalai, pridedami animacijos iteracijos metu
             var addToA = (1-targetTransform.a)/intervals;
             var addToD = (1-targetTransform.d)/intervals;
             var addToE = (targetTransform.e)/intervals;
             var addToF = (targetTransform.f)/intervals;
+            var addDegrees = Math.PI/2/intervals;
+            var currentDegrees = 0;
 
             var fps = 30;
-
 
             function draw() {
                 setTimeout(function() {
@@ -150,23 +154,29 @@
                     currentTransform.d -= addToD;
                     currentTransform.e += addToE;
                     currentTransform.f += addToF;
+                    if (quarter == 1)
+                        currentDegrees += addDegrees;
 
                        if (currentTransform.a >= targetTransform.a - 0.01) {
                            ctx.clearRect(0, 0, canvas.width, canvas.height);
                            ctx.save();
+
                            ctx.transform(currentTransform.a, 0, 0, currentTransform.d, currentTransform.e, currentTransform.f);
+                           if (quarter == 1)
+                                ctx.rotate(currentDegrees);
                            drawShape();
                            ctx.restore();
                         }
                         if (currentTransform.a <= targetTransform.a-0.01)
                             cancelAnimationFrame(frame);
+                         document.getElementById("hey").onclick = function fa() {
+                             cancelAnimationFrame(frame);
+                         }
 
                 }, 1000/fps);
-
             }
             draw();
         }
-
 
         function levelDown() {
             if (level == 0)
@@ -200,7 +210,7 @@
         }
 
         function transformPrevious() {
-            if (transformID == 0)
+            if (transformID < 2)
                 return
             else {
                 transformID--;
@@ -213,14 +223,20 @@
             if (transformID == 4)
                 return
             else {
+
                 transformID++;
                 document.getElementById("transform").innerHTML = transformID;
                 animate(transformID);
             }
         }
 
+        function retransform() {
+            animate(transformID);
+        }
+
         init();
         fractalize(0);
+
 
         </script>
     </body>
