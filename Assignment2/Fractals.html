@@ -2,18 +2,27 @@
 <html>
     <body>
         <center><canvas id="canvas2" width="500px" height="500px" style="border:3px solid black"></canvas></center>
-        <div>
-            <center>
-                <p style="font-size:20px;"><b>Level</b></p>
+        <div style="width:120px; margin:0 auto;";>
+
+                <p style="font-size:20px; margin-left:13"><b>Level </b></p>
                 <button class="button" onclick="levelDown()" type="button"> < </button>
                 <level id="level" class="bolden" style="font-size:25px; font-weight:bold">0</level>
                 <button class="button" onclick="levelUp()" type="button"> > </button>
-            </center>
+
+                <p style="font-size:20px; margin-right:20"><b>Transformation </b></p>
+                <button class="button" onclick="transformPrevious()" type="button"> < </button>
+                <transform id="transform" class="bolden" style="font-size:25px; font-weight:bold">0</transform>
+                <button class="button" onclick="transformNext()" type="button"> > </button>
+
         </div>
+
         <script>
 
         var canvas, ctx;
         var level = document.getElementById("level").innerHTML;
+        var transformID = document.getElementById("transform").innerHTML;
+        var frame;
+
 
         function init() {
             canvas = document.getElementById('canvas2');
@@ -62,74 +71,92 @@
                 ctx.transform(-0.5, 0, 0, -0.5, canvas.width/2, canvas.width);
                 fractalize(level);
             }
-
             else
                 drawShape();
         }
 
         function animate(quarter) {
+
             var a, d, e, f;
-            var currentTransform = {
-                a : 1,
-                d : 1,
-                e : 0,
-                f : 0,
+            var targetTransform = {} ;
+            var currentTransform =  // Pradines koord. sistemos transformacijos
+            {
+                a : 1,              // Horizontal scaling
+                d : 1,              // Vertical scaling
+                e : 0,              // Horizontal moving
+                f : 0,              // Vertical moving
             };
+            // targetTransform = norimos transformacijos kintamuju listas
             switch (quarter) {
                 case 1:
-                    a = -0.25;
-                    d = 0.25;
-                    e = canvas.width/4;
-                    f = canvas.height/4
+                    targetTransform = {
+                        a : -0.25,
+                        d : 0.25,
+                        e : canvas.width/4,
+                        f : canvas.height/4,
+                    }
                     break;
                 case 2:
-                    a = d = 0.5;
-                    e = 250; // 250px
+                    targetTransform = {
+                        a : 0.5,
+                        d : 0.5,
+                        e : canvas.width/2,
+                        f : 0,
+                    }
                     break;
                 case 3:
-                    a = -0.5;
-                    d = 0.5;
-                    e = canvas.width;
-                    f = canvas.height/2;
+                    targetTransform = {
+                        a : -0.5,
+                        d : 0.5,
+                        e : canvas.width,
+                        f : canvas.height/2,
+                    }
                     break;
                 case 4:
-                    a = c = -0.5
-                    e = canvas.width/2;
-                    f = canvas.width;
+                    targetTransform = {
+                        a : -0.5,
+                        d : -0.5,
+                        e : canvas.width/2,
+                        f : canvas.width,
+                    }
                     break;
             }
-            var scaleInt = 0.1
-            var MoveInt = 50;
-            var moveNull = 0;
-            var moveMeh = 1;
-            var fps = 15;
-            var frame;
+
+            var intervals = 100; // Kiek iteraciju bus skirta vienai animacijai
+            // Intervalai, kuriuos pridesim su kiekviena iteracija animacijai
+            var addToA = (1-targetTransform.a)/intervals;
+            var addToD = (1-targetTransform.d)/intervals;
+            var addToE = (targetTransform.e)/intervals;
+            var addToF = (targetTransform.f)/intervals;
+
+            var fps = 30;
+
 
             function draw() {
                 setTimeout(function() {
                     frame = requestAnimationFrame(draw);
-                    currentTransform.a -= 0.1;
-                    currentTransform.d -= 0.1;
-                    currentTransform.e += 50;
-                    a = currentTransform.a;
-                    d = currentTransform.d;
-                    e = currentTransform.e;
-                       if (a <= 0.55)
-                            cancelAnimationFrame(frame);
-                       if (a => 0.5) {
-                           ctx.clearRect(0,0,500,500);
+                    // Keiciam dabartines koord. sistemos duomenis intervalais
+                    currentTransform.a -= addToA;
+                    currentTransform.d -= addToD;
+                    currentTransform.e += addToE;
+                    currentTransform.f += addToF;
+
+                       if (currentTransform.a >= targetTransform.a - 0.01) {
+                           ctx.clearRect(0, 0, canvas.width, canvas.height);
                            ctx.save();
-                           ctx.transform(a, 0, 0, d, e, 0);
+                           ctx.transform(currentTransform.a, 0, 0, currentTransform.d, currentTransform.e, currentTransform.f);
                            drawShape();
                            ctx.restore();
                         }
+                        if (currentTransform.a <= targetTransform.a-0.01)
+                            cancelAnimationFrame(frame);
 
                 }, 1000/fps);
 
             }
             draw();
-
         }
+
 
         function levelDown() {
             if (level == 0)
@@ -160,10 +187,29 @@
             }
         }
 
-        init();
-        animate(2);
-        //fractalize(level);
+        function transformPrevious() {
+            if (transformID == 0)
+                return
+            else {
+                transformID--;
+                document.getElementById("transform").innerHTML = transformID;
+                animate(transformID);
+            }
+        }
 
+        function transformNext() {
+            if (transformID == 4)
+                return
+            else {
+                transformID++;
+                document.getElementById("transform").innerHTML = transformID;
+                animate(transformID);
+            }
+        }
+
+        init();
+        fractalize(0);
+        
         </script>
     </body>
 </html>
