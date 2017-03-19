@@ -22,12 +22,13 @@
         var level = document.getElementById("level").innerHTML;
         var previousLevel = level-1;
         var transformID = document.getElementById("transform").innerHTML;
-        var frame;
+        var animation;
 
         function init() {
             canvas = document.getElementById('canvas2');
             if (canvas.getContext) {
                 ctx = canvas.getContext('2d');
+                fractalize(0);
             }
         }
 
@@ -69,7 +70,7 @@
                 ctx.restore();
 
                 if (level == previousLevel)
-                ctx.fillStyle = "#A05959";
+                    ctx.fillStyle = "#A05959";
                 ctx.transform(-0.5, 0, 0, -0.5, canvas.width/2, canvas.width);
                 fractalize(level);
                 ctx.restore();
@@ -87,7 +88,7 @@
         function animate(quarter) {
 
             var a, d, e, f;
-            var targetTransform = {} ;
+            var targetTransform = {} ; // Galutines transformacijos
             var currentTransform =  // Pradines koord. sistemos transformacijos
             {
                 a : 1,              // Horizontal scaling
@@ -97,6 +98,7 @@
             };
             // targetTransform = norimos transformacijos kintamuju listas
             switch (quarter) {
+                // Top-left
                 case 1:
                     targetTransform = {
                         a : -0.25,
@@ -106,6 +108,7 @@
                     };
                     break;
 
+                // Top-right
                 case 2:
                     targetTransform = {
                         a : 0.5,
@@ -115,6 +118,7 @@
                     };
                     break;
 
+                // Bottom-left
                 case 3:
                     targetTransform = {
                         a : -0.5,
@@ -124,6 +128,7 @@
                     };
                     break;
 
+                // Bottom-right
                 case 4:
                     targetTransform = {
                         a : -0.5,
@@ -144,16 +149,18 @@
             var addDegrees = Math.PI/2/intervals;
             var currentDegrees = 0;
 
-            var fps = 30;
+            var fps = 45;
 
             function draw() {
                 setTimeout(function() {
-                    frame = requestAnimationFrame(draw);
-                    // Keiciam dabartines koord. sistemos duomenis intervalais
+                    animation = requestAnimationFrame(draw);
+
+                    // Pridedami intervalai prie transformaciju duomenu
                     currentTransform.a -= addToA;
                     currentTransform.d -= addToD;
                     currentTransform.e += addToE;
                     currentTransform.f += addToF;
+
                     if (quarter == 1)
                         currentDegrees += addDegrees;
 
@@ -165,13 +172,12 @@
                            if (quarter == 1)
                                 ctx.rotate(currentDegrees);
                            drawShape();
+
                            ctx.restore();
                         }
+                        
                         if (currentTransform.a <= targetTransform.a-0.01)
-                            cancelAnimationFrame(frame);
-                         document.getElementById("hey").onclick = function fa() {
-                             cancelAnimationFrame(frame);
-                         }
+                            cancelAnimationFrame(animation);
 
                 }, 1000/fps);
             }
@@ -183,12 +189,12 @@
                 return
             else {
                 ctx.save();
-                level --;
-                previousLevel = level-1;
+                level--;
+                previousLevel = level - 1;
                 ctx.setTransform(1,0,0,1,0,0);
                 ctx.clearRect(0,0,canvas.width, canvas.height);
                 document.getElementById('level').innerHTML = level;
-                ctx.clearRect(0,0,500,500);
+                ctx.clearRect(0,0,canvas.height, canvas.width);
                 fractalize(level);
                 ctx.restore();
             }
@@ -199,8 +205,8 @@
                 return
             else {
                 ctx.save();
-                level ++;
-                previousLevel = level-1;
+                level++;
+                previousLevel = level - 1;
                 ctx.setTransform(1,0,0,1,0,0);
                 document.getElementById("level").innerHTML = level;
                 ctx.clearRect(0,0,canvas.height, canvas.width);
@@ -223,7 +229,6 @@
             if (transformID == 4)
                 return
             else {
-
                 transformID++;
                 document.getElementById("transform").innerHTML = transformID;
                 animate(transformID);
@@ -235,8 +240,6 @@
         }
 
         init();
-        fractalize(0);
-
 
         </script>
     </body>
