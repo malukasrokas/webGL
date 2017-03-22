@@ -67,7 +67,6 @@ function fractalize(level) {
 
 function animate(quarter) {
 
-    var a, d, e, f;
     var targetTransform = {} ; // Galutines transformacijos
     var currentTransform =  // Pradines koord. sistemos transformacijos
     {
@@ -119,9 +118,8 @@ function animate(quarter) {
             break;
     }
 
-    var intervals = 100; // Kiek iteraciju bus skirta vienai animacijai
+    var intervals = 150;
 
-    // Intervalai, pridedami animacijos iteracijos metu
     var addToA = (1-targetTransform.a)/intervals;
     var addToD = (1-targetTransform.d)/intervals;
     var addToE = (targetTransform.e)/intervals;
@@ -129,13 +127,12 @@ function animate(quarter) {
     var addDegrees = Math.PI/2/intervals;
     var currentDegrees = 0;
 
-    var fps = 45;
+    var fps = 60;
 
     function draw() {
         setTimeout(function() {
             animation = requestAnimationFrame(draw);
 
-            // Pridedami intervalai prie transformaciju duomenu
             currentTransform.a -= addToA;
             currentTransform.d -= addToD;
             currentTransform.e += addToE;
@@ -156,7 +153,7 @@ function animate(quarter) {
                    ctx.restore();
                 }
 
-                if (currentTransform.a <= targetTransform.a-0.01)
+                if (currentTransform.a <= targetTransform.a-0.3)
                     cancelAnimationFrame(animation);
 
         }, 1000/fps);
