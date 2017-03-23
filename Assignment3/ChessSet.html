@@ -12,10 +12,10 @@
 		<script>
 
 		var scene, camera, renderer, controls;
-		var geometry, material, mesh, loader, color;
+		var geometry, material, mesh, loader;
 		var squareX = 128;
 		var squareY = 128;
-		color;
+
 		init();
 		animate();
 		drawSets();
@@ -58,6 +58,10 @@
 			controls.enableZoom = true;
 			controls.target.set(500,50,600);
 
+			// Directional Light
+			var directionalLight = new THREE.DirectionalLight(0x33eeff, 1);
+			directionalLight.castShadow = true;
+			scene.add(directionalLight);
 
 		}
 
@@ -111,17 +115,18 @@
 		}
 
 		function makeCube(width, height, length, x, y, z) {
-			var cubeGeometry, edges;
-			
-			cubeGeometry = new THREE.BoxGeometry(x, y, z);
-			cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+			var cubeGeometry = new THREE.BoxGeometry(x, y, z);
+			var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 			scene.add(cube);
 
-			 edges = new THREE.EdgesHelper(cube, 0x696969);
-			 edges.material.linewidth = 1;
-			 scene.add(edges);
-			 edges.position.set(width, height, length);
+			var edgeGeometry = new THREE.BoxBufferGeometry(x, y, z);
+			var edges = new THREE.EdgesGeometry(edgeGeometry);
+			var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color : 0x696969}));
+			scene.add(line);
+
 			cube.position.set(width, height, length);
+			line.position.set(width, height, length);
 		}
 
 		function setColor(color) {
