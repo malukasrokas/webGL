@@ -10,6 +10,7 @@
 		<script src="js/three.js"></script>
 		<script src="js/OrbitControls.js"></script>
 		<script>
+
 		var scene, camera, renderer, controls;
 		var geometry, material, mesh, loader;
 		var side = 128;
@@ -41,71 +42,6 @@
 				boardMesh.position.set(64+side*3, -20, 64+side*3);
 			})
 
-			var cubeGeometry, cubeMaterial, edges;
-			function change(x, y, z) {
-				cubeGeometry = new THREE.BoxGeometry(x, y, z);
-			}
-			function makeCube(width, height, length, x, y, z) {
-				cubeGeometry = new THREE.BoxGeometry(x, y, z);
-				cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-				scene.add(cube);
-				edges = new THREE.EdgesHelper(cube, 0x696969);
-				edges.material.linewidth = 1;
-				scene.add(edges);
-				edges.position.set(width, height, length);
-				cube.position.set(width, height, length);
-			}
-			function setColor(color) {
-				if (color == "white")
-					cubeMaterial = new THREE.MeshBasicMaterial({color: 0xf5ad6f});
-				else if (color == "black")
-					cubeMaterial = new THREE.MeshBasicMaterial({color: 0x2b1d0e });
-			}
-
-			function drawPawn(posX, posZ) {
-
-				makeCube(posX, 0,  posZ, 65, 30, 65);
-				makeCube(posX, 20, posZ, 50, 20, 50);
-				makeCube(posX, 40, posZ, 20, 80, 20);
-				makeCube(posX, 80, posZ, 40, 10, 40);
-				makeCube(posX, 87, posZ, 17, 17, 17);
-			}
-			setColor("white");
-			// Draws white pawns
-			for (i=0; i<8; i++) {
-				drawPawn(side*i, side);
-			}
-
-			function drawRook(posX, posZ) {
-				makeCube(posX, 0, posZ, 70, 30, 70);
-				makeCube(posX, 20, posZ, 50, 15, 50);
-				makeCube(posX, 40, posZ, 35, 75, 35);
-				makeCube(posX, 80, posZ, 50, 15, 50);
-				makeCube(posX, 90, posZ+18, 25, 20, 10);
-				makeCube(posX, 90, posZ-18, 25, 20, 10);
-				makeCube(posX-18, 90, posZ, 10, 20, 25);
-				makeCube(posX+18, 90, posZ, 10, 20, 25);
-			}
-
-			function drawBishop(posX, posZ) {
-				makeCube(posX, -10, posZ, 70, 20, 70);
-				makeCube(posX, 5, posZ, 60, 10, 60);
-				makeCube(posX, 10, posZ, 50, 10, 50);
-				makeCube(posX, 40, posZ, 25, 85, 25);
-				makeCube(posX, 78, posZ, 45, 5, 45);
-				makeCube(posX, 90, posZ, 20, 40, 20);
-				makeCube(posX, 90, posZ, 25, 20, 25);
-				makeCube(posX, 110, posZ, 10, 10, 10);
-				makeCube(posX, 115, posZ, 5, 5, 5);
-			}
-
-			drawRook(side*7, 0);
-			drawRook(0,0);
-
-			drawBishop(side*6,0);
-			drawBishop(side*1, 0);
-
-
 			// Skybox
 			var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
 			var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
@@ -119,6 +55,17 @@
 			controls.dampingFactor = 0.25;
 			controls.enableZoom = true;
 			controls.target.set(500,50,600);
+
+			setColor("white");
+			// Draws white pawns
+			for (i=0; i<8; i++) {
+				drawPawn(side*i, side);
+			}
+			drawRook(side*7, 0);
+			drawRook(0,0);
+
+			drawBishop(side*5,0);
+			drawBishop(side*2, 0);
 		}
 
 		function animate() {
@@ -132,6 +79,65 @@
 		function render() {
 			renderer.render( scene, camera );
 		}
+
+		function change(x, y, z) {
+			var cubeGeomtery;
+			cubeGeometry = new THREE.BoxGeometry(x, y, z);
+		}
+
+		function makeCube(width, height, length, x, y, z) {
+			var cubeGeometry, edges;
+
+			cubeGeometry = new THREE.BoxGeometry(x, y, z);
+			cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+			scene.add(cube);
+
+			edges = new THREE.EdgesHelper(cube, 0x696969);
+			edges.material.linewidth = 1;
+			scene.add(edges);
+
+			edges.position.set(width, height, length);
+			cube.position.set(width, height, length);
+		}
+		function setColor(color) {
+			if (color == "white")
+				cubeMaterial = new THREE.MeshBasicMaterial({color: 0xf5ad6f});
+			else if (color == "black")
+				cubeMaterial = new THREE.MeshBasicMaterial({color: 0x2b1d0e });
+		}
+
+		function drawPawn(posX, posZ) {
+
+			makeCube(posX, 0,  posZ, 65, 30, 65);
+			makeCube(posX, 20, posZ, 50, 20, 50);
+			makeCube(posX, 40, posZ, 20, 80, 20);
+			makeCube(posX, 80, posZ, 40, 10, 40);
+			makeCube(posX, 87, posZ, 17, 17, 17);
+		}
+
+		function drawRook(posX, posZ) {
+			makeCube(posX, 0, posZ, 70, 30, 70);
+			makeCube(posX, 20, posZ, 50, 15, 50);
+			makeCube(posX, 40, posZ, 35, 75, 35);
+			makeCube(posX, 80, posZ, 50, 15, 50);
+			makeCube(posX, 90, posZ+18, 25, 20, 10);
+			makeCube(posX, 90, posZ-18, 25, 20, 10);
+			makeCube(posX-18, 90, posZ, 10, 20, 25);
+			makeCube(posX+18, 90, posZ, 10, 20, 25);
+		}
+
+		function drawBishop(posX, posZ) {
+			makeCube(posX, -10, posZ, 70, 20, 70);
+			makeCube(posX, 5, posZ, 60, 10, 60);
+			makeCube(posX, 10, posZ, 50, 10, 50);
+			makeCube(posX, 40, posZ, 25, 85, 25);
+			makeCube(posX, 78, posZ, 45, 5, 45);
+			makeCube(posX, 90, posZ, 20, 40, 20);
+			makeCube(posX, 90, posZ, 25, 20, 25);
+			makeCube(posX, 110, posZ, 10, 10, 10);
+			makeCube(posX, 115, posZ, 5, 5, 5);
+		}
+
 		</script>
 	</body>
 </html>
