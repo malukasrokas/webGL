@@ -18,6 +18,7 @@
 
 		init();
 		animate();
+		createBoard();
 		drawSets();
 
 		function init() {
@@ -32,23 +33,21 @@
 		    camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 1, 10000 );
 			camera.position.set(500, 300, -500);
 
-			// Texture Loader
-			loader = new THREE.TextureLoader();
-			// Chess board
-			loader.load('img/chessboard.png', function(texture) {
-
-				var geometry = new THREE.BoxGeometry(1024,10,1024);
-				var material = new THREE.MeshBasicMaterial({ map: texture, overdraw: 0.5});
-				var boardMesh = new THREE.Mesh(geometry, material);
-				scene.add(boardMesh);
-				boardMesh.position.set(64+128*3, -20, 64+128*3);
-			})
-
 			// Skybox
 			var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
 			var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
 			var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 			scene.add(skyBox);
+
+			// Spotlight
+			var spotlight = new THREE.SpotLight(0x000000);
+			spotlight.position.set(100, 100, 100);
+			spotlight.shadowCameraVisible = true;
+			spotlight.shadowDarkness = 0.95;
+			spotlight.intensity = 2;
+			spotlight.castShadow = true;
+			scene.add(spotlight);
+
 
 			// Controls
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -118,6 +117,7 @@
 
 			var cubeGeometry = new THREE.BoxGeometry(x, y, z);
 			var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+			cube.castShadow = true;
 			scene.add(cube);
 
 			var edgeGeometry = new THREE.BoxBufferGeometry(x, y, z);
@@ -138,6 +138,21 @@
 				cubeMaterial = new THREE.MeshBasicMaterial({color: 0x2b1d0e });
 				color = "black";
 			}
+		}
+
+		function createBoard() {
+			// Texture Loader
+			loader = new THREE.TextureLoader();
+			// Chess board
+			loader.load('img/chessboard.png', function(texture) {
+
+				var geometry = new THREE.BoxGeometry(1024,10,1024);
+				var material = new THREE.MeshLambertMaterial({ map: texture, overdraw: 0.5});
+				var boardMesh = new THREE.Mesh(geometry, material);
+				boardMesh.receiveShadow = true;
+				scene.add(boardMesh);
+				boardMesh.position.set(64+128*3, -20, 64+128*3);
+			});
 		}
 
 		function drawPawn(posX, posZ) {
