@@ -12,11 +12,13 @@
 		<script>
 
 		var scene, camera, renderer, controls;
-		var geometry, material, mesh, loader;
-		var side = 128;
-
+		var geometry, material, mesh, loader, color;
+		var squareX = 128;
+		var squareY = 128;
+		color;
 		init();
 		animate();
+		drawSets();
 
 		function init() {
 
@@ -39,7 +41,7 @@
 				var material = new THREE.MeshBasicMaterial({ map: texture, overdraw: 0.5});
 				var boardMesh = new THREE.Mesh(geometry, material);
 				scene.add(boardMesh);
-				boardMesh.position.set(64+side*3, -20, 64+side*3);
+				boardMesh.position.set(64+128*3, -20, 64+128*3);
 			})
 
 			// Skybox
@@ -56,22 +58,7 @@
 			controls.enableZoom = true;
 			controls.target.set(500,50,600);
 
-			setColor("white");
-			// Draws white pawns
-			for (i=0; i<8; i++) {
-				drawPawn(side*i, side);
-			}
-			drawRook(side*7, 0);
-			drawRook(0,0);
 
-			drawBishop(side*5,0);
-			drawBishop(side*2, 0);
-
-			drawKing(side*4, 0);
-			drawQueen(side*3, 0);
-
-			drawKnight(side*6, 0);
-			drawKnight(side*1, 0);
 		}
 
 		function animate() {
@@ -86,31 +73,66 @@
 			renderer.render( scene, camera );
 		}
 
-		function change(x, y, z) {
-			var cubeGeomtery;
-			cubeGeometry = new THREE.BoxGeometry(x, y, z);
+		function drawSets() {
+			setColor("white");
+			// Draws white pawns
+			for (i=0; i<8; i++) {
+				drawPawn(squareX*i, squareY);
+			}
+			drawRook(squareX*7, 0);
+			drawRook(0,0);
+
+			drawKnight(squareX*6, 0);
+			drawKnight(squareX*1, 0);
+
+			drawBishop(squareX*5,0);
+			drawBishop(squareX*2, 0);
+
+			drawKing(squareX*4, 0);
+			drawQueen(squareX*3, 0);
+
+
+			setColor("black");
+			color = "black";
+			for (i=0; i<8; i++) {
+				drawPawn(squareX*i, squareY*6);
+			}
+			drawRook(squareX*7, squareY*7);
+			drawRook(0, squareY*7);
+
+			drawKnight(squareX*6, squareY*7);
+			drawKnight(squareX*1, squareY*7);
+
+			drawBishop(squareX*5, squareY*7);
+			drawBishop(squareX*2, squareY*7);
+
+			drawKing(squareX*4, squareY*7);
+			drawQueen(squareX*3, squareY*7);
 		}
 
 		function makeCube(width, height, length, x, y, z) {
 			var cubeGeometry, edges;
-
+			
 			cubeGeometry = new THREE.BoxGeometry(x, y, z);
 			cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 			scene.add(cube);
 
-			edges = new THREE.EdgesHelper(cube, 0x696969);
-			edges.material.linewidth = 1;
-			scene.add(edges);
-
-			edges.position.set(width, height, length);
+			 edges = new THREE.EdgesHelper(cube, 0x696969);
+			 edges.material.linewidth = 1;
+			 scene.add(edges);
+			 edges.position.set(width, height, length);
 			cube.position.set(width, height, length);
 		}
 
 		function setColor(color) {
-			if (color == "white")
+			if (color == "white") {
 				cubeMaterial = new THREE.MeshBasicMaterial({color: 0xf5ad6f});
-			else if (color == "black")
+				color = "white";
+			}
+			else if (color == "black") {
 				cubeMaterial = new THREE.MeshBasicMaterial({color: 0x2b1d0e });
+				color = "black";
+			}
 		}
 
 		function drawPawn(posX, posZ) {
