@@ -12,6 +12,7 @@
 		<script>
 		var scene, camera, renderer, controls;
 		var geometry, material, mesh, loader;
+		var side = 128;
 
 		init();
 		animate();
@@ -25,30 +26,39 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 
-		    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-		    camera.position.z = 1000;
+		    camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 1, 10000 );
+			camera.position.set(500, 300, -500);
+
 			// Texture Loader
 			loader = new THREE.TextureLoader();
+			// Chess board
 			loader.load('img/chessboard.png', function(texture) {
 
-				var geometry = new THREE.BoxGeometry(960,960,20);
+				var geometry = new THREE.BoxGeometry(1024,10,1024);
 				var material = new THREE.MeshBasicMaterial({ map: texture, overdraw: 0.5});
 				var mesh = new THREE.Mesh(geometry, material);
 				scene.add(mesh);
+				mesh.position.set(64+side*3, 0, 64+side*3);
 			})
 
 
-		    cubeGeometry = new THREE.BoxGeometry( 200, 200, 200 );
-		    cubeMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+		    // cubeGeometry = new THREE.BoxGeometry( 128, 50, 128 );
+		    // cubeMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+			//
+		    // cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+		    // scene.add( cube );
+			// cube.position.set(side*4, 30, 0);
 
-		    cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
-		    scene.add( cube );
+			function drawPawn() {
+				var cubeGeometry, cubeMaterial;
+				cubeGeometry = new THREE.BoxGeometry( side, 50, side );
+			    cubeMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+				cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+				scene.add( cube );
+				cube.position.set(side, 30, side);
+			}
+			drawPawn();
 
-			// Plane
-			var planeGeometry = new THREE.PlaneGeometry( 100, 100, 32 );
-			var planeMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
-			var plane = new THREE.Mesh( planeGeometry, planeMaterial );
-			scene.add( plane );
 
 			// Skybox
 			var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
@@ -62,14 +72,13 @@
 			controls.enableDamping = true;
 			controls.dampingFactor = 0.25;
 			controls.enableZoom = true;
+			controls.target.set(500,50,600);
 		}
 
 		function animate() {
 
 		    requestAnimationFrame( animate );
 
-		     cube.rotation.x += 0.01;
-		     cube.rotation.y += 0.02;
 		    render();
 			controls.update();
 		}
