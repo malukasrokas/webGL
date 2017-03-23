@@ -66,6 +66,9 @@
 
 			drawBishop(side*5,0);
 			drawBishop(side*2, 0);
+
+			drawKing(side*4, 0);
+			drawQueen(side*3, 0);
 		}
 
 		function animate() {
@@ -99,6 +102,7 @@
 			edges.position.set(width, height, length);
 			cube.position.set(width, height, length);
 		}
+
 		function setColor(color) {
 			if (color == "white")
 				cubeMaterial = new THREE.MeshBasicMaterial({color: 0xf5ad6f});
@@ -136,6 +140,50 @@
 			makeCube(posX, 90, posZ, 25, 20, 25);
 			makeCube(posX, 110, posZ, 10, 10, 10);
 			makeCube(posX, 115, posZ, 5, 5, 5);
+		}
+
+		function drawKing(posX, posZ) {
+			makeCube(posX, -10, posZ, 80, 10, 80);
+			makeCube(posX, -3, posZ, 70, 7, 70);
+			makeCube(posX, 0, posZ, 55, 15, 55);
+			makeCube(posX, 45, posZ, 40, 95, 40);
+			makeCube(posX, 90, posZ, 65, 10, 65);
+			makeCube(posX, 96, posZ, 30, 5, 30);
+			makeCube(posX, 99, posZ, 35, 5, 35);
+			makeCube(posX, 102, posZ, 45, 5, 45);
+			makeCube(posX, 105, posZ, 55, 5, 55);
+			makeCube(posX, 120, posZ, 15, 50, 15);
+			makeCube(posX, 130, posZ, 50, 12, 12);
+		}
+
+		function drawQueen(posX, posZ) {
+			makeCube(posX, -10, posZ, 80, 10, 80);
+			makeCube(posX, -3, posZ, 70, 7, 70);
+			makeCube(posX, 0, posZ, 55, 15, 55);
+			makeCube(posX, 45, posZ, 30, 95, 30);
+			makeCube(posX, 90, posZ, 65, 10, 65);
+			makeCube(posX, 96, posZ, 60, 5, 60);
+			makeCube(posX, 99, posZ, 50, 5, 50);
+			makeCube(posX, 102, posZ, 45, 15, 45);
+			// Crown
+			makeCube(posX, 114, posZ-20, 15, 25, 2);
+			makeCube(posX, 114, posZ+20, 15, 25, 2);
+			makeCube(posX+15, 114, posZ-20, 10, 17, 2);
+			makeCube(posX-15, 114, posZ-20, 10, 17, 2);
+			makeCube(posX-15, 114, posZ+20, 10, 17, 2);
+			makeCube(posX+15, 114, posZ+20, 10, 17, 2);
+
+			makeCube(posX-20, 114, posZ, 2, 25, 15);
+			makeCube(posX-20, 114, posZ-15, 2, 17, 10);
+			makeCube(posX-20, 114, posZ+15, 2, 17, 10);
+			makeCube(posX+20, 114, posZ, 2, 25, 15);
+			makeCube(posX+20, 114, posZ+15, 2, 17, 10);
+			makeCube(posX+20, 114, posZ-15, 2, 17, 10);
+
+			makeCube(posX, 114, posZ, 25, 10, 25);
+			makeCube(posX, 120, posZ, 17, 10, 17);
+			makeCube(posX, 130, posZ, 7, 12, 7);
+
 		}
 
 		</script>
