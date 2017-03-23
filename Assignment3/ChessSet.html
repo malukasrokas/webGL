@@ -38,7 +38,8 @@
 				var material = new THREE.MeshBasicMaterial({ map: texture, overdraw: 0.5});
 				var mesh = new THREE.Mesh(geometry, material);
 				scene.add(mesh);
-				mesh.position.set(64+side*3, 0, 64+side*3);
+
+				mesh.position.set(64+side*3, -20, 64+side*3);
 			})
 
 
@@ -48,16 +49,31 @@
 		    // cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
 		    // scene.add( cube );
 			// cube.position.set(side*4, 30, 0);
-
-			function drawPawn() {
-				var cubeGeometry, cubeMaterial;
-				cubeGeometry = new THREE.BoxGeometry( side, 50, side );
-			    cubeMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
-				cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
-				scene.add( cube );
-				cube.position.set(side, 30, side);
+			var cubeGeometry, cubeMaterial;
+			function change(x, y, z) {
+				cubeGeometry = new THREE.BoxGeometry(x, y, z);
 			}
-			drawPawn();
+			function makeCube(width, height, length, x, y, z) {
+				cubeGeometry = new THREE.BoxGeometry(x, y, z);
+				cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+				scene.add(cube);
+				cube.position.set(width, height, length);
+			}
+
+			function drawPawn(posX, posZ) {
+				cubeMaterial = new THREE.MeshBasicMaterial( { color: 0xf5ad6f } );
+				cubeGeometry = new THREE.BoxGeometry( 80, 30, 80 );
+
+				makeCube(posX, 0,  posZ, 80, 30, 80);
+				makeCube(posX, 20, posZ, 50, 20, 50);
+				makeCube(posX, 40, posZ, 20, 80, 20);
+				makeCube(posX, 80, posZ, 40, 10, 40);
+				makeCube(posX, 87, posZ, 17, 17, 17);
+			}
+			
+			for (i=0; i<8; i++) {
+				drawPawn(side*i, side);
+			}
 
 
 			// Skybox
