@@ -11,7 +11,7 @@
 		<script src="js/OrbitControls.js"></script>
 		<script>
 		var scene, camera, renderer, controls;
-		var geometry, material, mesh;
+		var geometry, material, mesh, loader;
 
 		init();
 		animate();
@@ -20,43 +20,56 @@
 
 		    scene = new THREE.Scene();
 
+			// Renderer
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
 		    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 		    camera.position.z = 1000;
+			// Texture Loader
+			loader = new THREE.TextureLoader();
+			loader.load('img/chessboard.png', function(texture) {
+
+				var geometry = new THREE.BoxGeometry(960,960,20);
+				var material = new THREE.MeshBasicMaterial({ map: texture, overdraw: 0.5});
+				var mesh = new THREE.Mesh(geometry, material);
+				scene.add(mesh);
+			})
 
 
+		    cubeGeometry = new THREE.BoxGeometry( 200, 200, 200 );
+		    cubeMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
 
-		    geometry = new THREE.BoxGeometry( 200, 200, 200 );
-		    material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+		    cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+		    scene.add( cube );
 
-		    mesh = new THREE.Mesh( geometry, material );
-		    scene.add( mesh );
-
-			var geo = new THREE.PlaneGeometry( 100, 100, 32 );
-			var mat = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
-			var plane = new THREE.Mesh( geo, mat );
+			// Plane
+			var planeGeometry = new THREE.PlaneGeometry( 100, 100, 32 );
+			var planeMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+			var plane = new THREE.Mesh( planeGeometry, planeMaterial );
 			scene.add( plane );
 
-		    renderer = new THREE.WebGLRenderer();
-		    renderer.setSize( window.innerWidth, window.innerHeight );
+			// Skybox
+			var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
+			var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
+			var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+			scene.add(skyBox);
 
+			// Controls
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.addEventListener( 'change', render ); // remove when using animation loop
-			// enable animation loop when using damping or autorotation
 			controls.enableDamping = true;
 			controls.dampingFactor = 0.25;
 			controls.enableZoom = true;
-
-		    document.body.appendChild( renderer.domElement );
-
 		}
 
 		function animate() {
 
 		    requestAnimationFrame( animate );
 
-		    // mesh.rotation.x += 0.01;
-		    // mesh.rotation.y += 0.02;
-
+		     cube.rotation.x += 0.01;
+		     cube.rotation.y += 0.02;
 		    render();
 			controls.update();
 		}
