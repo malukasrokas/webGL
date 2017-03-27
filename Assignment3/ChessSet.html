@@ -29,6 +29,8 @@
 			renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 		    camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 1, 10000 );
 			camera.position.set(500, 300, -500);
@@ -39,29 +41,52 @@
 			var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 			scene.add(skyBox);
 
-			// Spotlight
-			var spotlight = new THREE.SpotLight(0x000000);
-			spotlight.position.set(100, 100, 100);
-			spotlight.shadowCameraVisible = true;
-			spotlight.shadowDarkness = 0.95;
-			spotlight.intensity = 2;
-			spotlight.castShadow = true;
-			scene.add(spotlight);
-
-
 			// Controls
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
-			controls.addEventListener( 'change', render ); // remove when using animation loop
+			controls.addEventListener( 'change', render );
 			controls.enableDamping = true;
-			controls.dampingFactor = 0.25;
+			controls.dampingFactor = 0.75;
 			controls.enableZoom = true;
 			controls.target.set(500,50,600);
 
-			// Directional Light
-			var directionalLight = new THREE.DirectionalLight(0x33eeff, 1);
-			directionalLight.castShadow = true;
-			scene.add(directionalLight);
+			// Spotlight
+			var spotLight = new THREE.SpotLight(0xffffff);
+			spotLight.position.set(500,1400,1200);
+			spotLight.castShadow = true;
+			spotLight.shadow.mapSize.width = 1024;
+			spotLight.shadow.mapSize.height = 1024;
 
+			spotLight.shadow.camera.near = 500;
+			spotLight.shadow.camera.far = 4000;
+			spotLight.shadow.camera.fov = 30;
+			spotLight.target.position.set(500, 0, 500);
+			scene.add (spotLight.target);
+			scene.add( spotLight );
+
+			var spotLight2 = new THREE.SpotLight(0x800000);
+			spotLight2.position.set(500,1400,-200);
+			spotLight2.castShadow = true;
+			spotLight2.shadow.mapSize.width = 1024;
+			spotLight2.shadow.mapSize.height = 1024;
+
+			spotLight2.shadow.camera.near = 500;
+			spotLight2.shadow.camera.far = 4000;
+			spotLight2.shadow.camera.fov = 30;
+			spotLight2.target.position.set(500, 0, 500);
+			scene.add (spotLight2.target);
+			scene.add( spotLight2 );
+
+			// Light Camera Helpers
+			var helper = new THREE.CameraHelper(spotLight2.shadow.camera);
+			scene.add(helper);
+			var helper2 = new THREE.CameraHelper(spotLight.shadow.camera);
+			scene.add(helper2);
+
+			// Shadow Test Cube
+			cubes = new THREE.Mesh( new THREE.CubeGeometry( 50, 50, 50 ), new THREE.MeshLambertMaterial({color: 0x800000}) );
+			cubes.position.set(400, 200, 400);
+			cubes.castShadow = true;
+			scene.add(cubes);
 		}
 
 		function animate() {
@@ -118,11 +143,13 @@
 			var cubeGeometry = new THREE.BoxGeometry(x, y, z);
 			var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 			cube.castShadow = true;
+			cube.receiveShadow = true;
 			scene.add(cube);
 
 			var edgeGeometry = new THREE.BoxBufferGeometry(x, y, z);
 			var edges = new THREE.EdgesGeometry(edgeGeometry);
-			var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color : 0x696969}));
+
+			var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color : 0x000000}));
 			scene.add(line);
 
 			cube.position.set(width, height, length);
@@ -131,11 +158,11 @@
 
 		function setColor(color) {
 			if (color == "white") {
-				cubeMaterial = new THREE.MeshBasicMaterial({color: 0xf5ad6f});
+				cubeMaterial = new THREE.MeshLambertMaterial({color: 0xf5ad6f});
 				color = "white";
 			}
 			else if (color == "black") {
-				cubeMaterial = new THREE.MeshBasicMaterial({color: 0x2b1d0e });
+				cubeMaterial = new THREE.MeshLambertMaterial({color: 0x413839 });
 				color = "black";
 			}
 		}
