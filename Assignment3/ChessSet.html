@@ -40,6 +40,7 @@
 			var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
 			var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 			scene.add(skyBox);
+
 			// Controls
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			controls.addEventListener( 'change', render );
@@ -54,11 +55,11 @@
 			spotLight.castShadow = true;
 			spotLight.shadow.mapSize.width = 1024;
 			spotLight.shadow.mapSize.height = 1024;
-
 			spotLight.shadow.camera.near = 500;
-			spotLight.shadow.camera.far = 4000;
+			spotLight.shadow.camera.far = 2000;
 			spotLight.shadow.camera.fov = 30;
 			spotLight.target.position.set(500, 0, 500);
+
 			scene.add (spotLight.target);
 			scene.add( spotLight );
 
@@ -69,29 +70,30 @@
 			spotLight2.shadow.mapSize.height = 1024;
 
 			spotLight2.shadow.camera.near = 500;
-			spotLight2.shadow.camera.far = 4000;
+			spotLight2.shadow.camera.far = 2000;
 			spotLight2.shadow.camera.fov = 30;
 			spotLight2.target.position.set(500, 0, 500);
+
 			scene.add (spotLight2.target);
 			scene.add( spotLight2 );
 
 			// Light Camera Helpers
-			var helper = new THREE.CameraHelper(spotLight2.shadow.camera);
-			scene.add(helper);
-			var helper2 = new THREE.CameraHelper(spotLight.shadow.camera);
-			scene.add(helper2);
+			// var helper = new THREE.CameraHelper(spotLight2.shadow.camera);
+			// scene.add(helper);
+			// var helper2 = new THREE.CameraHelper(spotLight.shadow.camera);
+			// scene.add(helper2);
 
-			// Shadow Test Cubes
-			cubes = new THREE.Mesh( new THREE.CubeGeometry( 50, 50, 50 ), new THREE.MeshLambertMaterial({color: 0x800000}) );
-			cubes.position.set(400, 200, 400);
-			cubes.castShadow = true;
-			scene.add(cubes);
-
-			cube = new THREE.Mesh( new THREE.CubeGeometry( 500, 10, 500 ), new THREE.MeshLambertMaterial({color: 0xffffff}) );
-			cube.position.set(400, 100, 400);
-			cube.receiveShadow = true;
-			cube.castShadow = true;
-			scene.add(cube);
+			//Shadow Test Cubes
+			// cubes = new THREE.Mesh( new THREE.CubeGeometry( 50, 50, 50 ), new THREE.MeshLambertMaterial({color: 0x800000}) );
+			// cubes.position.set(400, 200, 400);
+			// cubes.castShadow = true;
+			// scene.add(cubes);
+			//
+			// cube = new THREE.Mesh( new THREE.CubeGeometry( 500, 10, 500 ), new THREE.MeshLambertMaterial({color: 0xffffff}) );
+			// cube.position.set(400, 100, 400);
+			// cube.receiveShadow = true;
+			// cube.castShadow = true;
+			// scene.add(cube);
 		}
 
 		function animate() {
@@ -108,9 +110,9 @@
 
 		function drawSets() {
 			setColor("white");
-			// Draws white pawns
+			// Draws white pieces
 			for (i=0; i<8; i++) {
-				drawPawn(squareX*i, squareY);
+				drawPawn(squareX*i, squareY*2);
 			}
 			drawRook(squareX*7, 0);
 			drawRook(0,0);
@@ -126,6 +128,7 @@
 
 
 			setColor("black");
+			// Draws black pieces
 			for (i=0; i<8; i++) {
 				drawPawn(squareX*i, squareY*6);
 			}
@@ -174,8 +177,8 @@
 		function createBoard() {
 			// Texture Loader
 			loader = new THREE.TextureLoader();
-			// Chess board
 
+			// Chess board
 			loader.load('img/chessboard.png', function(texture) {
 
 				var geometry = new THREE.BoxGeometry(1024,10,1024);
