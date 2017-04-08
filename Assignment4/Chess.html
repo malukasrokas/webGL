@@ -9,6 +9,7 @@
 	<body>
 		<script src="js/three.js"></script>
 		<script src="js/OrbitControls.js"></script>
+		<script type="text/javascript" src="data.json"></script>
 		<script>
 
 		var scene, camera, renderer, controls;
@@ -81,8 +82,6 @@
 			controls.enableZoom = true;
 			controls.target.set(500,50,600);
 
-
-
 			// Reanimating the scene and creating the board
             animate();
             createBoard();
@@ -90,35 +89,20 @@
 		}
 
 		function generatePoints(segments) {
-            var pointsX = [
-				38, 40, 38, 37, 35,
-				25, 17, 14, 12, 10,
-				8, 15, 8,
-				4, 4, 7, 10, 13, 14,
-				13, 10, 7, 4, 2, 0
-				];
-	    	var pointsY = [
-				0, 2, 4, 15, 19,
-				25, 35, 45, 60, 75,
-				80, 85, 88,
-				90, 92, 94, 96, 98, 100,
-				103, 106, 109, 112, 114, 116
-				];
-
 
             var points = [];
-            var count = pointsX.length;
-            for (var i = 0; i <= count; i++) {
-                points.push(new THREE.Vector2(pointsX[i], pointsY[i]));
+            var count = pawn.pointsX.length;
+            for (var i = 0; i < count; i++) {
+                points.push(new THREE.Vector2(pawn.pointsX[i], pawn.pointsY[i]));
             }
 
             // use the same points to create a latheGeometry
             //var latheGeometry = new THREE.LatheGeometry(points, Math.ceil(segments), phiStart, phiLength);
-            var latheGeometry = new THREE.LatheGeometry(points, 36, 0, 2 * Math.PI);
-            latheMesh = createMesh(latheGeometry);
+            var figureGeometry = new THREE.LatheGeometry(points);
+            latheMesh = createMesh(figureGeometry);
 			latheMesh.castShadow = true;
             scene.add(latheMesh);
-			latheMesh.position.set(128*4, 20, 0);
+			latheMesh.position.set(128*4, 0, 0);
         }
 
         function createMesh(geom) {
