@@ -27283,7 +27283,7 @@
 
 		// generate vertices and uvs
 
-		for ( i = 0; i <= segments; i ++ ) {
+		for ( i = 0; i < segments; i ++ ) {
 
 			var phi = phiStart + i * inverseSegments * phiLength;
 

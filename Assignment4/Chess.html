@@ -26,7 +26,7 @@
 			// Renderer
 			renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
-            renderer.shadowMapEnabled = true;
+            renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 			document.body.appendChild( renderer.domElement );
 
@@ -39,14 +39,14 @@
             scene.add(axes);
 
             // Test cube
-            var cubeGeometry = new THREE.CubeGeometry(40,40,40);
-            var cubeMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
-            var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-            cube.castShadow = true;
-            cube.position.x=400;
-            cube.position.y=100;
-            cube.position.z=400;
-            scene.add(cube);
+            // var cubeGeometry = new THREE.CubeGeometry(40,40,40);
+            // var cubeMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
+            // var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            // cube.castShadow = true;
+            // cube.position.x=400;
+            // cube.position.y=100;
+            // cube.position.z=400;
+            // scene.add(cube);
 
             // Spotlight
             var spotLight = new THREE.SpotLight( 0xffffff, 1, 100000 );
@@ -81,9 +81,62 @@
 			controls.enableZoom = true;
 			controls.target.set(500,50,600);
 
+
+
+			// Reanimating the scene and creating the board
             animate();
             createBoard();
+			generatePoints();
 		}
+
+		function generatePoints(segments) {
+            var pointsX = [
+				38, 40, 38, 37, 35,
+				25, 17, 14, 12, 10,
+				8, 15, 8,
+				4, 4, 7, 10, 13, 14,
+				13, 10, 7, 4, 2, 0
+				];
+	    	var pointsY = [
+				0, 2, 4, 15, 19,
+				25, 35, 45, 60, 75,
+				80, 85, 88,
+				90, 92, 94, 96, 98, 100,
+				103, 106, 109, 112, 114, 116
+				];
+
+
+            var points = [];
+            var count = pointsX.length;
+            for (var i = 0; i <= count; i++) {
+                points.push(new THREE.Vector2(pointsX[i], pointsY[i]));
+            }
+
+            // use the same points to create a latheGeometry
+            //var latheGeometry = new THREE.LatheGeometry(points, Math.ceil(segments), phiStart, phiLength);
+            var latheGeometry = new THREE.LatheGeometry(points, 36, 0, 2 * Math.PI);
+            latheMesh = createMesh(latheGeometry);
+			latheMesh.castShadow = true;
+            scene.add(latheMesh);
+			latheMesh.position.set(128*4, 20, 0);
+        }
+
+        function createMesh(geom) {
+
+            // assign two materials
+            //  var meshMaterial = new THREE.MeshBasicMaterial({color:0x00ff00, transparent:true, opacity:0.6});
+            var meshMaterial = new THREE.MeshLambertMaterial({color: 0xeed5b7});
+            meshMaterial.side = THREE.DoubleSide;
+
+            var wireFrameMat = new THREE.MeshBasicMaterial({color: 0x00ff00});
+            wireFrameMat.wireframe = true;
+            // create a multimaterial
+            var mesh = THREE.SceneUtils.createMultiMaterialObject(geom, [meshMaterial, wireFrameMat]);
+			mesh.children.forEach(function(material) {
+				material.castShadow = true;
+			})
+			return mesh;
+        }
 
 		function animate() {
 
@@ -104,12 +157,12 @@
 			// Chess board
 			loader.load('img/chessboard.png', function(texture) {
 
-				var geometry = new THREE.BoxGeometry(1024,10,1024);
+				var geometry = new THREE.BoxGeometry(1024,5,1024);
 				var material = new THREE.MeshLambertMaterial({ map: texture, overdraw: 0.5});
 				var boardMesh = new THREE.Mesh(geometry, material);
 				boardMesh.receiveShadow = true;
 				scene.add(boardMesh);
-				boardMesh.position.set(64+128*3, -20, 64+128*3);
+				boardMesh.position.set(64+128*3, -3, 64+128*3);
 			});
 		}
 
