@@ -7,8 +7,8 @@
 		</style>
 	</head>
 	<body>
-		<script src="js/three.js"></script>
-		<script src="js/OrbitControls.js"></script>
+		<script src="../jslib/three.js"></script>
+		<script src="../jslib/OrbitControls.js"></script>
 		<script>
 
 		var scene, camera, renderer, controls;
@@ -50,8 +50,8 @@
 			controls.target.set(500,50,600);
 
 			// Spotlight
-			var spotLight = new THREE.SpotLight(0xffffff);
-			spotLight.position.set(500,1000,1500);
+			var spotLight = new THREE.SpotLight(0xffffff,1,10000);
+			spotLight.position.set(-500, 800, 1000);
 			spotLight.castShadow = true;
 			spotLight.shadow.mapSize.width = 1024;
 			spotLight.shadow.mapSize.height = 1024;
@@ -77,23 +77,6 @@
 			scene.add (spotLight2.target);
 			scene.add( spotLight2 );
 
-			// Light Camera Helpers
-			// var helper = new THREE.CameraHelper(spotLight2.shadow.camera);
-			// scene.add(helper);
-			// var helper2 = new THREE.CameraHelper(spotLight.shadow.camera);
-			// scene.add(helper2);
-
-			//Shadow Test Cubes
-			// cubes = new THREE.Mesh( new THREE.CubeGeometry( 50, 50, 50 ), new THREE.MeshLambertMaterial({color: 0x800000}) );
-			// cubes.position.set(400, 200, 400);
-			// cubes.castShadow = true;
-			// scene.add(cubes);
-			//
-			// cube = new THREE.Mesh( new THREE.CubeGeometry( 500, 10, 500 ), new THREE.MeshLambertMaterial({color: 0xffffff}) );
-			// cube.position.set(400, 100, 400);
-			// cube.receiveShadow = true;
-			// cube.castShadow = true;
-			// scene.add(cube);
 		}
 
 		function animate() {
@@ -110,9 +93,10 @@
 
 		function drawSets() {
 			setColor("white");
+
 			// Draws white pieces
 			for (i=0; i<8; i++) {
-				drawPawn(squareX*i, squareY*2);
+				drawPawn(squareX*i, squareY*1);
 			}
 			drawRook(squareX*7, 0);
 			drawRook(0,0);
