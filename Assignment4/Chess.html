@@ -15,7 +15,7 @@
 
 		var scene, camera, renderer, controls;
 		var figure;
-		var geometry, material, mesh, loader;
+		//var geometry, material, mesh, loader;
 		var squareX = 128;
 		var squareY = 128;
 		var loader = new THREE.TextureLoader();
@@ -26,7 +26,6 @@
 		function init() {
 
 		    scene = new THREE.Scene();
-
 			// Renderer
 			renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -39,18 +38,8 @@
 			camera.position.set( 500, 300, -500 );
 
             // Axes
-            var axes = new THREE.AxisHelper( 200 );
-            scene.add( axes );
-
-            // Test cube
-            // var cubeGeometry = new THREE.CubeGeometry(40,40,40);
-            // var cubeMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
-            // var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-            // cube.castShadow = true;
-            // cube.position.x=400;
-            // cube.position.y=100;
-            // cube.position.z=400;
-            // scene.add(cube);
+            // var axes = new THREE.AxisHelper( 200 );
+            // scene.add( axes );
 
             // Spotlight
             var spotLight = new THREE.SpotLight( 0xffffff, 0.7, 10000 );
@@ -101,14 +90,31 @@
 
 		function buildSet() {
 
-			buildPiece(pawn);
+			buildPawns();
+			buildRooks();
 
+			}
+
+		function buildPawns() {
+
+			buildPiece(pawn);
 			for (i=0; i<8; i++) {
 				var pawnClone = figure.clone();
 				pawnClone.position.set(squareX*i, 0, squareY);
 				scene.add(pawnClone);
 			}
+		}
 
+		function buildRooks() {
+
+			buildPiece(rook);
+			var rookClone = figure.clone();
+			rookClone.position.set(0, 0, 0);
+			scene.add(rookClone);
+
+			var rookClone = figure.clone();
+			rookClone.position.set(squareX*7, 0, 0);
+			scene.add(rookClone);
 		}
 
 		function buildPiece(piece) {
@@ -119,7 +125,7 @@
                 points.push(new THREE.Vector2(piece.pointsX[i], piece.pointsY[i]));
             }
 
-            var figureGeometry = new THREE.LatheGeometry( points );
+            var figureGeometry = new THREE.LatheGeometry( points, 24 );
             figure = createMesh( figureGeometry );
 			figure.castShadow = true;
         }
@@ -130,6 +136,7 @@
 		    	var meshMaterial = new THREE.MeshLambertMaterial({color: 0xeed5b7});
 			else if (color == "black")
 				var meshMaterial = new THREE.MeshLambertMaterial({color: 0x254117});
+
             meshMaterial.side = THREE.DoubleSide;
 
 			// Wireframe
@@ -154,7 +161,6 @@
 		function render() {
 			renderer.render( scene, camera );
 		}
-
 
 		function createBoard() {
 
