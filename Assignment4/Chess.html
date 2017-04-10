@@ -93,6 +93,7 @@
 			buildPawns();
 			buildRooks();
 			buildKings();
+			buildQueens();
 			}
 
 		function buildPawns() {
@@ -108,34 +109,45 @@
 
 		function buildRooks() {
 
-			buildPiece(rook);
+			buildPiece( rook );
 			var rookClone = figure.clone();
 			rookClone.position.set(0, 0, 0);
-			scene.add(rookClone);
+			scene.add( rookClone );
 
 			var rookClone = figure.clone();
-			rookClone.position.set(squareX*7, 0, 0);
-			scene.add(rookClone);
+			rookClone.position.set( squareX*7, 0, 0 );
+			scene.add( rookClone );
+		}
+
+		function buildQueens() {
+
+			buildPiece( queen );
+			var queenClone = figure.clone();
+			queenClone.position.set(squareX*3, 0, 0);
+			scene.add( queenClone );
 		}
 
 		function buildKings() {
 
 			var geometry, cube;
 			var kingGroup = new THREE.Object3D();
-			var kingPiece = buildPiece( king );
+
+			buildPiece( king );
 			var kingClone = figure.clone();
 			kingClone.position.set( squareX*4, 0, 0 );
 
+			// Vertical cube
 			kingGroup.add( kingClone );
-			geometry = new THREE.BoxGeometry( 5, 25, 5 );
+			geometry = new THREE.BoxGeometry( 5, 20, 5 );
 			cube = createMesh( geometry );
 			cube.castShadow = true;
-			cube.position.set( kingClone.position.x, kingClone.position.z + 185, kingClone.position.y );
+			cube.position.set( kingClone.position.x, kingClone.position.z + 190, kingClone.position.y );
 			kingGroup.add( cube );
 
+			// Horizontal cube
 			geometry = new THREE.BoxGeometry( 20, 5, 5 );
 			cube = createMesh( geometry );
-			cube.position.set( kingClone.position.x, kingClone.position.z + 188, kingClone.position.y );
+			cube.position.set( kingClone.position.x, kingClone.position.z + 190, kingClone.position.y );
 
 			kingGroup.add( cube );
 
