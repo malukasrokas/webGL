@@ -119,20 +119,27 @@
 		}
 
 		function buildKings() {
-			var kingPiece = buildPiece(king);
-			var geometry = new THREE.BoxGeometry( 5, 25, 5 );
-			var cube = createMesh(geometry);
-			scene.add( cube );
 
+			var geometry, cube;
+			var kingGroup = new THREE.Object3D();
+			var kingPiece = buildPiece( king );
 			var kingClone = figure.clone();
-			scene.add(kingClone);
 			kingClone.position.set( squareX*4, 0, 0 );
-			cube.position.set(kingClone.position.x, kingClone.position.z + 185, kingClone.position.y);
+
+			kingGroup.add( kingClone );
+			geometry = new THREE.BoxGeometry( 5, 25, 5 );
+			cube = createMesh( geometry );
+			cube.castShadow = true;
+			cube.position.set( kingClone.position.x, kingClone.position.z + 185, kingClone.position.y );
+			kingGroup.add( cube );
 
 			geometry = new THREE.BoxGeometry( 20, 5, 5 );
-			cube = createMesh(geometry);
-			scene.add(cube);
-			cube.position.set(kingClone.position.x, kingClone.position.z + 188, kingClone.position.y);
+			cube = createMesh( geometry );
+			cube.position.set( kingClone.position.x, kingClone.position.z + 188, kingClone.position.y );
+
+			kingGroup.add( cube );
+
+			scene.add( kingGroup );
 		}
 
 		function buildPiece(piece) {
