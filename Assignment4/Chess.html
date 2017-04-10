@@ -14,9 +14,12 @@
 		<script>
 
 		var scene, camera, renderer, controls;
+		var figure;
 		var geometry, material, mesh, loader;
 		var squareX = 128;
 		var squareY = 128;
+		var loader = new THREE.TextureLoader();
+		var color = "white";
 
 		init();
 
@@ -50,8 +53,8 @@
             // scene.add(cube);
 
             // Spotlight
-            var spotLight = new THREE.SpotLight( 0xffffff, 1, 100000 );
-            spotLight.position.set( 100, 500, 100 );
+            var spotLight = new THREE.SpotLight( 0xffffff, 0.7, 10000 );
+            spotLight.position.set( 100, 800, 500 );
             spotLight.castShadow = true;
             spotLight.shadow.mapSize.width = 1024;
             spotLight.shadow.mapSize.height = 1024;
@@ -92,36 +95,48 @@
 			// Reanimating the scene and creating the board
             animate();
             createBoard();
-			generatePoints();
+			buildSet();
 		}
 
-		function generatePoints(segments) {
+
+		function buildSet() {
+
+			buildPiece(pawn);
+
+			for (i=0; i<8; i++) {
+				var pawnClone = figure.clone();
+				pawnClone.position.set(squareX*i, 0, squareY);
+				scene.add(pawnClone);
+			}
+
+		}
+
+		function buildPiece(piece) {
 
             var points = [];
-            var count = pawn.pointsX.length;
+            var count = piece.pointsX.length;
             for (var i = 0; i < count; i++) {
-                points.push(new THREE.Vector2(pawn.pointsX[i], pawn.pointsY[i]));
+                points.push(new THREE.Vector2(piece.pointsX[i], piece.pointsY[i]));
             }
 
-            // use the same points to create a latheGeometry
-            //var latheGeometry = new THREE.LatheGeometry(points, Math.ceil(segments), phiStart, phiLength);
             var figureGeometry = new THREE.LatheGeometry( points );
-            latheMesh = createMesh( figureGeometry );
-			latheMesh.castShadow = true;
-            scene.add(latheMesh);
-			latheMesh.position.set( 128*4, 0, 0 );
+            figure = createMesh( figureGeometry );
+			figure.castShadow = true;
         }
 
         function createMesh( geom ) {
 
-            // assign two materials
-            //  var meshMaterial = new THREE.MeshBasicMaterial({color:0x00ff00, transparent:true, opacity:0.6});
-            var meshMaterial = new THREE.MeshLambertMaterial({color: 0xeed5b7});
+			if (color == "white")
+		    	var meshMaterial = new THREE.MeshLambertMaterial({color: 0xeed5b7});
+			else if (color == "black")
+				var meshMaterial = new THREE.MeshLambertMaterial({color: 0x254117});
             meshMaterial.side = THREE.DoubleSide;
 
+			// Wireframe
             var wireFrameMat = new THREE.MeshBasicMaterial({color: 0x00ff00});
             wireFrameMat.wireframe = true;
-            // create a multimaterial
+
+			// Multimaterial
             var mesh = THREE.SceneUtils.createMultiMaterialObject(geom, [meshMaterial, wireFrameMat]);
 			mesh.children.forEach(function( material ) {
 				material.castShadow = true;
@@ -142,8 +157,6 @@
 
 
 		function createBoard() {
-			// Texture Loader
-			loader = new THREE.TextureLoader();
 
 			// Chess board
 			loader.load('img/chessboard.png', function(texture) {
