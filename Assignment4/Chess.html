@@ -92,7 +92,7 @@
 
 			buildPawns();
 			buildRooks();
-
+			buildKings();
 			}
 
 		function buildPawns() {
@@ -105,6 +105,7 @@
 			}
 		}
 
+
 		function buildRooks() {
 
 			buildPiece(rook);
@@ -115,6 +116,23 @@
 			var rookClone = figure.clone();
 			rookClone.position.set(squareX*7, 0, 0);
 			scene.add(rookClone);
+		}
+
+		function buildKings() {
+			var kingPiece = buildPiece(king);
+			var geometry = new THREE.BoxGeometry( 5, 25, 5 );
+			var cube = createMesh(geometry);
+			scene.add( cube );
+
+			var kingClone = figure.clone();
+			scene.add(kingClone);
+			kingClone.position.set( squareX*4, 0, 0 );
+			cube.position.set(kingClone.position.x, kingClone.position.z + 185, kingClone.position.y);
+
+			geometry = new THREE.BoxGeometry( 20, 5, 5 );
+			cube = createMesh(geometry);
+			scene.add(cube);
+			cube.position.set(kingClone.position.x, kingClone.position.z + 188, kingClone.position.y);
 		}
 
 		function buildPiece(piece) {
