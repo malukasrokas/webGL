@@ -94,6 +94,7 @@
 			buildRooks();
 			buildKings();
 			buildQueens();
+			buildBishops();
 			}
 
 		function buildPawns() {
@@ -114,9 +115,19 @@
 			rookClone.position.set(0, 0, 0);
 			scene.add( rookClone );
 
-			var rookClone = figure.clone();
+			rookClone = figure.clone();
 			rookClone.position.set( squareX*7, 0, 0 );
 			scene.add( rookClone );
+		}
+
+		function buildBishops() {
+			buildPiece( bishop );
+			var bishopClone = figure.clone();
+			bishopClone.position.set( squareX*5, 0, 0 );
+			scene.add( bishopClone );
+			bishopClone = figure.clone();
+			bishopClone.position.set( squareX*2, 0, 0 );
+			scene.add( bishopClone );
 		}
 
 		function buildQueens() {
