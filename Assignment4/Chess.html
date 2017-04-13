@@ -59,6 +59,10 @@
             // var helper = new THREE.CameraHelper(spotLight.shadow.camera);
             // scene.add(helper);
 
+			// Ambient Light
+			var ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
+			scene.add( ambientLight );
+
 			// Second spotlight
 			var spotLight2 = new THREE.SpotLight( 0xffffff, 1.1 );
 			scene.add( spotLight2 );
@@ -134,9 +138,7 @@
 			knightShape.bezierCurveTo( 10, 110, 15, 120, 60, 95 );
 			knightShape.bezierCurveTo( 75, 90, 78, 95, 70, 80)
 			knightShape.lineTo( 60, 80 );
-			knightShape.bezierCurveTo( 70, 80, 50, 100,55, 75 )
-			knightShape.lineTo( 70, 74 );
-			knightShape.lineTo( 70, 76 );
+			knightShape.bezierCurveTo( 70, 80, 50, 100, 50, 77 )
 			knightShape.moveTo( 70, 74 );
 			knightShape.lineTo( 65, 68 );
 			knightShape.bezierCurveTo( 55, 65, 45, 80, 40, 68 );
@@ -154,10 +156,8 @@
 
 			// Creating knight top mesh and positioning it
 			var meshMaterial = new THREE.MeshLambertMaterial( {color: 0xeed5b7} );
-			var wireFrameMat = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-            wireFrameMat.wireframe = true;
 			var geometry = new THREE.ExtrudeGeometry( knightShape, extrudeSettings );
-			var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [meshMaterial, wireFrameMat] );
+			var mesh = new THREE.Mesh( geometry, meshMaterial );
 			mesh.position.set( knightClone.position.x + 8, 52, -40 );
 			mesh.rotateY( Math.PI*2/4*3 );
 
@@ -216,14 +216,17 @@
 			// Vertical cube
 			kingGroup.add( kingClone );
 			geometry = new THREE.BoxGeometry( 5, 20, 5 );
-			cube = createMesh( geometry );
+			material = new THREE.MeshLambertMaterial( {color: 0xeed5b7} );
+			cube = new THREE.Mesh( geometry, material );
+			//cube = createMesh( geometry );
 			cube.castShadow = true;
 			cube.position.set( kingClone.position.x, kingClone.position.z + 190, kingClone.position.y );
 			kingGroup.add( cube );
 
 			// Horizontal cube
 			geometry = new THREE.BoxGeometry( 20, 5, 5 );
-			cube = createMesh( geometry );
+			//cube = createMesh( geometry );
+			cube = new THREE.Mesh( geometry, material );
 			cube.position.set( kingClone.position.x, kingClone.position.z + 190, kingClone.position.y );
 
 			kingGroup.add( cube );
@@ -239,8 +242,12 @@
                 points.push( new THREE.Vector2(piece.pointsX[i], piece.pointsY[i]) );
             }
 
+			
+
             var figureGeometry = new THREE.LatheGeometry( points, 24 );
-            figure = createMesh( figureGeometry );
+			var figureMaterial = new THREE.MeshLambertMaterial( {color: 0xeed5b7} );
+			figure = new THREE.Mesh( figureGeometry, figureMaterial );
+            //figure = createMesh( figureGeometry );
 			figure.castShadow = true;
         }
 
