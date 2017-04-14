@@ -7,7 +7,6 @@
 	</style>
 	<script src="../jslib/three.js"></script>
 	<script src="../jslib/OrbitControls.js"></script>
-	<script src="../jslib/csg.js"></script>
 	<script src="../jslib/ThreeCSG.js"></script>
 	<script type="text/javascript" src="data.json"></script>
 </head>
@@ -19,6 +18,7 @@
 		var row;
 		var squareX = 128;
 		var squareZ = 128;
+		color = 1;
 
 		init();
 
@@ -81,19 +81,25 @@
 
 			// var materialNormal = new THREE.MeshNormalMaterial();
 			//
-			// var cubeGeometry = new THREE.CubeGeometry( 100, 100, 100 );
-			// var cubeMesh = new THREE.Mesh( cubeGeometry );
-			// var cubeBSP = new ThreeBSP( cubeMesh );
+			// buildPiece( bishop );
+			// //var cubeMesh = new THREE.Mesh( cubeGeometry );
+			// var cubeMesh = figure.clone();
+			// var bishopMeshBSP = new ThreeBSP( cubeMesh );
 			//
-			// var sphereGeometry = new THREE.SphereGeometry( 60, 32, 32 );
-			// var sphereMesh = new THREE.Mesh( sphereGeometry );
-			// var sphereBSP = new ThreeBSP( sphereMesh );
-
-			//	cube.substract(sphere);
-			// var newBSP = cubeBSP.subtract( sphereBSP );
-			// var newMesh = newBSP.toMesh( materialNormal );
-			// newMesh.position.set(450, 250, 450);
-			// scene.add( newMesh );
+			// var cutGeometry = new THREE.CubeGeometry( 4, 50, 50 );
+			// var cutMesh = new THREE.Mesh( cutGeometry );
+			// cutMesh.position.set(-15, 150, 0);
+			// cutMesh.rotateZ(Math.PI/180*35);
+			// //scene.add(cutMesh);
+			// //cutMesh.position.set()
+			// var cutMeshBSP = new ThreeBSP( cutMesh );
+			//
+			//
+			// //cube.substract(sphere);
+			// var cutBishopMeshBSP = bishopMeshBSP.subtract( cutMeshBSP );
+			// var cutBishop = cutBishopMeshBSP.toMesh( materialNormal );
+			// //cutBishop.position.set(450, 250, 450);
+			// scene.add( cutBishop );
 
 
 			// Reanimating the scene and creating the board
@@ -101,6 +107,7 @@
 			buildSet();
 		}
 
+		// Changes color to white(0) or black(1)
 		function setColor( pieceColor ) {
 
 			color = pieceColor;
@@ -111,6 +118,7 @@
 				material = new THREE.MeshLambertMaterial({ color: 0x624121 });
 		}
 
+		// Creates the chess board and generates pieces on both sides
 		function buildSet() {
 
 			createBoard();
@@ -126,18 +134,20 @@
 			}
 		}
 
+		// Creates a flat cube with texture on it
 		function createBoard() {
 
 			var loader = new THREE.TextureLoader();
-			// Chess board
 			loader.load('img/chessboard.png', function(texture) {
 
-				var geometry = new THREE.BoxGeometry( 1024, 5, 1024 );
-				var material = new THREE.MeshLambertMaterial({
+				var geometry, material, boardMesh;
+
+				geometry = new THREE.BoxGeometry( 1024, 5, 1024 );
+				material = new THREE.MeshLambertMaterial({
 					map: texture,
 					overdraw: 0.5
 				});
-				var boardMesh = new THREE.Mesh( geometry, material );
+				boardMesh = new THREE.Mesh( geometry, material );
 				boardMesh.receiveShadow = true;
 				scene.add( boardMesh );
 				boardMesh.position.set( 64 + 128 * 3, -3, 64 + 128 * 4 );
@@ -238,18 +248,35 @@
 			scene.add( rookClone );
 		}
 
+		// This function uses threeCSG library to make a cut in bishop piece
+		// Variables with BSP are threeCSG meshes
 		function buildBishops() {
 
-			var bishopClone;
+			var bishopMesh, cutBishop, cutBishopClone, cutGeometry, cutMesh;
+			var cutMeshBSP, bishopMeshBSP, cutBishopMeshBSP;
 			buildPiece( bishop );
 
-			bishopClone = figure.clone();
-			bishopClone.position.set( squareX * 5, 0, squareZ * row );
-			scene.add( bishopClone );
+			bishopMesh = figure.clone();
+			bishopMeshBSP = new ThreeBSP( bishopMesh );
 
-			bishopClone = figure.clone();
-			bishopClone.position.set( squareX * 2, 0, squareZ * row );
-			scene.add( bishopClone );
+			// The cube that will be subtracted from bishop mesh
+			cutGeometry = new THREE.CubeGeometry( 4, 50, 50 );
+			cutMesh = new THREE.Mesh( cutGeometry );
+			cutMesh.position.set(-15, 150, 0);
+			cutMesh.rotateZ(Math.PI/180*35);
+			cutMeshBSP = new ThreeBSP( cutMesh );
+
+			// The cut bishop mesh creation and positioning
+			cutBishopMeshBSP = bishopMeshBSP.subtract( cutMeshBSP );
+			cutBishop = cutBishopMeshBSP.toMesh( material );
+			cutBishop.castShadow = true;
+			cutBishop.position.set( squareX *5, 0, squareZ * row );
+			scene.add( cutBishop );
+
+			// Cut bishop's clone and positioning
+			cutBishopClone = cutBishop.clone();
+			cutBishopClone.position.set( squareX * 2, 0, squareZ * row );
+			scene.add(cutBishopClone);
 		}
 
 		function buildQueens() {
@@ -301,7 +328,7 @@
 				points.push(new THREE.Vector2( piece.pointsX[i], piece.pointsY[i] ));
 			}
 
-			figureGeometry = new THREE.LatheGeometry( points, 24 );
+			figureGeometry = new THREE.LatheGeometry( points, 36 );
 			figure = new THREE.Mesh( figureGeometry, material );
 			figure.castShadow = true;
 		}
