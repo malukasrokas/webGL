@@ -8,6 +8,7 @@
 	<script src="../jslib/three.js"></script>
 	<script src="../jslib/OrbitControls.js"></script>
 	<script src="../jslib/ThreeCSG.js"></script>
+	<script src="../jslib/dat.gui.js"></script>
 	<script type="text/javascript" src="data.json"></script>
 </head>
 
@@ -21,33 +22,46 @@
 		color = 1;
 
 		init();
+		animate();
+		buildSet();
 
 		function init() {
 
 			var spotLight, spotLight2, ambientLight;
+			var helper;
+			var params = {
+				castShadow: true,
+				shadowCameraVisible: false,
+				shadowCameraNear: 17,
+				shadowCameraFar: 2500,
+				shadowCameraFov: 45,
+				shadowBias: -0.0002,
+				targetX: 400,
+				targetZ: 500,
+			};
 
 			scene = new THREE.Scene();
+
 			// Renderer
-			renderer = new THREE.WebGLRenderer();
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
 			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 			document.body.appendChild( renderer.domElement );
 			renderer.setClearColor( 0x9999ff );
+			renderer.gammaInput = true;
+			renderer.gammaOutput = true;
 
 			// Camera
 			camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 1, 10000 );
 			camera.position.set( 500, 300, -400 );
 
 			// Spotlight
-			spotLight = new THREE.SpotLight( 0xffffff, 0.7, 10000 );
-			spotLight.position.set( 100, 800, 500 );
-			spotLight.castShadow = true;
-			spotLight.shadow.mapSize.width = 1024;
-			spotLight.shadow.mapSize.height = 1024;
-			spotLight.shadow.camera.near = 0.1;
-			spotLight.shadow.camera.far = 1200;
-			spotLight.shadow.camera.fov = 50;
+			spotLight = new THREE.SpotLight( 0xffffff, 0.6, 0, Math.PI/2 );
+			spotLight.position.set( -400, 1150, 200 );
+			spotLight.castShadow = params.castShadow;
+			spotLight.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( params.shadowCameraFov, 1, params.shadowCameraNear, params.shadowCameraFar ) );
+			spotLight.shadow.bias = params.shadowBias;
 			scene.add( spotLight );
 
 			// Spotlight target
@@ -55,19 +69,13 @@
 			scene.add( spotLight.target );
 
 			// Spotlight helper
-			// var helper = new THREE.CameraHelper(spotLight.shadow.camera);
-			// scene.add(helper);
+			helper = new THREE.CameraHelper(spotLight.shadow.camera);
+			scene.add(helper);
+			helper.visible = params.shadowCameraVisible;
 
 			// Ambient Light
 			ambientLight = new THREE.AmbientLight(0x404040); // soft white light
 			scene.add( ambientLight );
-
-			// Second spotlight
-			spotLight2 = new THREE.SpotLight(0xffffff, 1.1);
-			scene.add( spotLight2 );
-			spotLight2.position.set( 0, 1000, 0 );
-			spotLight2.target.position.set( 512, 0, 512 );
-			scene.add( spotLight2.target );
 
 			// Controls
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -77,9 +85,53 @@
 			controls.enableZoom = true;
 			controls.target.set( 500, 50, 600 );
 
-			// Reanimating the scene and creating the board
-			animate();
-			buildSet();
+			// dat.gui testing
+			var gui = new dat.GUI({
+				height : 5 * 32 - 1,
+				width : 350
+			});
+
+			gui.add( params, 'castShadow' ).onChange( function () {
+				spotLight.castShadow = params.castShadow;
+			});
+
+			gui.add( params, 'shadowCameraVisible' ).onChange( function () {
+				helper.visible = params.shadowCameraVisible;
+			});
+
+			gui.add( params, 'shadowCameraNear', 0, 30 ).onChange( function () {
+
+        		spotLight.shadow.camera.near = params.shadowCameraNear;
+				spotLight.shadow.camera.updateProjectionMatrix();
+				helper.update();
+    		});
+
+			gui.add( params, 'shadowCameraFar', 1000, 5000 ).onChange( function () {
+
+        		spotLight.shadow.camera.far = params.shadowCameraFar;
+				spotLight.shadow.camera.updateProjectionMatrix();
+				helper.update();
+    		});
+
+			gui.add( params, 'shadowCameraFov', 1, 120 ).onChange( function () {
+
+				spotLight.shadow.camera.fov = params.shadowCameraFov;
+				spotLight.shadow.camera.updateProjectionMatrix();
+				helper.update();
+			});
+
+			gui.add( params, 'shadowBias', -0.01, 0.01 ).onChange( function () {
+				spotLight.shadow.bias = params.shadowBias;
+			});
+
+			gui.add( params, 'targetX', -200, 1024 ).onChange( function () {
+				spotLight.target.position.set( params.targetX, 0, params.targetZ );
+			});
+
+			gui.add( params, 'targetZ', -200, 1024 ).onChange( function () {
+				spotLight.target.position.set( params.targetX, 0, params.targetZ );
+			});
+
 		}
 
 		// Changes color to white(0) or black(1)
@@ -88,9 +140,9 @@
 			color = pieceColor;
 
 			if ( color == 0 )
-				material = new THREE.MeshLambertMaterial({ color: 0xe5e589 });
+				material = new THREE.MeshPhongMaterial({ color: 0xe5e589 });
 			else if ( color == 1 )
-				material = new THREE.MeshLambertMaterial({ color: 0x624121 });
+				material = new THREE.MeshPhongMaterial({ color: 0x624121 });
 		}
 
 		// Creates the chess board and generates pieces on both sides
@@ -237,8 +289,8 @@
 			// The cube that will be subtracted from bishop mesh
 			cutGeometry = new THREE.CubeGeometry( 4, 50, 50 );
 			cutMesh = new THREE.Mesh( cutGeometry );
-			cutMesh.position.set(-15, 150, 0);
-			cutMesh.rotateZ(Math.PI/180*35);
+			cutMesh.position.set( -15, 150, 0 );
+			cutMesh.rotateZ( Math.PI/180*35 );
 			cutMeshBSP = new ThreeBSP( cutMesh );
 
 			// The cut bishop mesh creation and positioning
@@ -251,7 +303,7 @@
 			// Cut bishop's clone and positioning
 			cutBishopClone = cutBishop.clone();
 			cutBishopClone.position.set( squareX * 2, 0, squareZ * row );
-			scene.add(cutBishopClone);
+			scene.add( cutBishopClone );
 		}
 
 		function buildQueens() {
@@ -306,6 +358,7 @@
 			figureGeometry = new THREE.LatheGeometry( points, 36 );
 			figure = new THREE.Mesh( figureGeometry, material );
 			figure.castShadow = true;
+			figure.receiveShadow = true;
 		}
 
 		function animate() {
