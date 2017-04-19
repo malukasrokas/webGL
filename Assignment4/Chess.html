@@ -61,13 +61,13 @@
 			// Textures
 			textureLoader = new THREE.TextureLoader();
 
-			lightPieceTexture = textureLoader.load( "img/LightPieceTexture.jpg" );
+			lightPieceTexture = textureLoader.load( "textures/LightPieceTexture.jpg" );
 			lightPieceTexture.repeat.set( 5, 8 );
 			lightPieceTexture.wrapS = lightPieceTexture.wrapT = THREE.RepeatWrapping;
 
-			darkPieceTexture = textureLoader.load( "img/DarkPieceTexture.jpg" );
-			tableTexture = textureLoader.load( "img/TableTexture.jpg" );
-			boardTexture = textureLoader.load( "img/BoardTexture.png" );
+			darkPieceTexture = textureLoader.load( "textures/DarkPieceTexture.jpg" );
+			tableTexture = textureLoader.load( "textures/TableTexture.jpg" );
+			boardTexture = textureLoader.load( "textures/BoardTexture.png" );
 
 			// Camera
 			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
