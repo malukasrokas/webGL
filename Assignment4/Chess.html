@@ -28,8 +28,7 @@
 		function init() {
 
 			var spotLight, spotLight2, ambientLight;
-			var helper, gui, textureLoader;
-			var degree = Math.PI/180;
+			var shadowCameraHelper, gui, textureLoader;
 			var shadowCameraRadius = 1000;
 			var shadowGUI = {
 				castShadow: true,
@@ -46,13 +45,15 @@
 				spotLightDegree: 160
 			};
 
+			window.addEventListener( 'resize', onWindowResize, false );
+
 			scene = new THREE.Scene();
 
 			// Renderer
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
-			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+			//renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 			document.body.appendChild( renderer.domElement );
 			renderer.setClearColor( 0x9999ff );
 			renderer.gammaInput = true;
@@ -61,17 +62,17 @@
 			// Textures
 			textureLoader = new THREE.TextureLoader();
 
-			lightPieceTexture = textureLoader.load( "textures/LightPieceTexture.jpg" );
-			lightPieceTexture.repeat.set( 5, 8 );
-			lightPieceTexture.wrapS = lightPieceTexture.wrapT = THREE.RepeatWrapping;
-
 			darkPieceTexture = textureLoader.load( "textures/DarkPieceTexture.jpg" );
 			tableTexture = textureLoader.load( "textures/TableTexture.jpg" );
 			boardTexture = textureLoader.load( "textures/BoardTexture.png" );
+			lightPieceTexture = textureLoader.load( "textures/LightPieceTexture.jpg" );
+
+			lightPieceTexture.repeat.set( 5, 8 );
+			lightPieceTexture.wrapS = lightPieceTexture.wrapT = THREE.RepeatWrapping;
 
 			// Camera
-			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-			camera.position.set( 500, 300, -400 );
+			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+			camera.position.set( 300, 300, -500 );
 
 			// Spotlight
 			spotLight = new THREE.SpotLight( 0xffffff, 0.6, 0, Math.PI/2 );
@@ -90,9 +91,9 @@
 			scene.add( spotLight.target );
 
 			// Spotlight helper
-			helper = new THREE.CameraHelper(spotLight.shadow.camera);
-			scene.add(helper);
-			helper.visible = shadowGUI.shadowCameraVisible;
+			shadowCameraHelper = new THREE.CameraHelper(spotLight.shadow.camera);
+			scene.add(shadowCameraHelper);
+			shadowCameraHelper.visible = shadowGUI.shadowCameraVisible;
 
 			// Ambient Light
 			ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
@@ -116,28 +117,28 @@
 
 			gui.add( shadowGUI, 'shadowCameraVisible' ).onChange( function () {
 
-				helper.visible = shadowGUI.shadowCameraVisible;
+				shadowCameraHelper.visible = shadowGUI.shadowCameraVisible;
 			} );
 
 			gui.add( shadowGUI, 'shadowCameraNear', 0, 30 ).onChange( function () {
 
         		spotLight.shadow.camera.near = shadowGUI.shadowCameraNear;
 				spotLight.shadow.camera.updateProjectionMatrix();
-				helper.update();
+				shadowCameraHelper.update();
     		} );
 
 			gui.add( shadowGUI, 'shadowCameraFar', 500, 5000 ).onChange( function () {
 
         		spotLight.shadow.camera.far = shadowGUI.shadowCameraFar;
 				spotLight.shadow.camera.updateProjectionMatrix();
-				helper.update();
+				shadowCameraHelper.update();
     		} );
 
 			gui.add( shadowGUI, 'shadowCameraFov', 1, 120 ).onChange( function () {
 
 				spotLight.shadow.camera.fov = shadowGUI.shadowCameraFov;
 				spotLight.shadow.camera.updateProjectionMatrix();
-				helper.update();
+				shadowCameraHelper.update();
 			} );
 
 			gui.add( shadowGUI, 'shadowBias', -0.002, 0.008 ).onChange( function () {
@@ -210,23 +211,24 @@
 		// Creates a textured tabletop and a board
 		function createBoard() {
 
-
 			var boardGeometry, boardMaterial, boardMesh;
-
-			boardGeometry = new THREE.BoxGeometry( 1024, 5, 1024 );
-			boardMaterial = new THREE.MeshLambertMaterial( { map: boardTexture } );
-			boardMesh = new THREE.Mesh( boardGeometry, boardMaterial );
-			boardMesh.receiveShadow = true;
-			scene.add( boardMesh );
-			boardMesh.position.set( squareX * 3.5, -3, squareZ * 4.5 );
-
 			var tableGeometry, tableMaterial, tableMesh;
+
+			// Tabletop
 			tableGeometry = new THREE.BoxGeometry( 1300, 5, 1500 );
 			tableMaterial = new THREE.MeshLambertMaterial( { map: tableTexture } );
 			tableMesh = new THREE.Mesh( tableGeometry, tableMaterial );
 			tableMesh.receiveShadow = true;
 			scene.add( tableMesh );
 			tableMesh.position.set( squareX * 3.5, -10, squareZ * 4.5 )
+
+			// Chess board
+			boardGeometry = new THREE.BoxGeometry( 1024, 5, 1024 );
+			boardMaterial = new THREE.MeshLambertMaterial( { map: boardTexture } );
+			boardMesh = new THREE.Mesh( boardGeometry, boardMaterial );
+			boardMesh.receiveShadow = true;
+			scene.add( boardMesh );
+			boardMesh.position.set( squareX * 3.5, -3, squareZ * 4.5 );
 		}
 
 		function buildPawns() {
@@ -426,6 +428,15 @@
 		function render() {
 
 			renderer.render( scene, camera );
+		}
+
+		// Resizes window when needed
+		function onWindowResize(){
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
 		}
 
 	</script>
